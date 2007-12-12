@@ -24,6 +24,10 @@ repository that houses your code.
         'console_scripts': [
             'bugit = bugit.cli:main',
             ],
+        'bugit.command': [
+            'list = bugit.cmd_list:main',
+            'show = bugit.cmd_show:main',
+            ],
         },
 
     test_suite = 'nose.collector'

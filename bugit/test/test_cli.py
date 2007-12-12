@@ -1,7 +1,5 @@
 from nose.tools import eq_ as eq
 
-from bugit import cli
-
 from bugit.test import util
 
 USAGE = """\
@@ -29,3 +27,18 @@ def test_global_help():
             ],
         )
     eq(result.stdout, USAGE)
+
+def test_bad_command():
+    result = util.clitest(
+        args=[
+            'xyzzy',
+            ],
+        allow_stderr=True,
+        exit_status=2,
+        )
+    eq(result.stdout, '')
+    eq(result.stderr, """\
+Usage: bugit COMMAND [ARGS]
+
+bugit: error: Unknown command: xyzzy
+""")

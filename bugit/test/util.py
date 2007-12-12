@@ -17,6 +17,7 @@ def _get_script():
 def clitest(
     args,
     exit_status=None,
+    allow_stderr=False,
     ):
     if exit_status is None:
         exit_status = 0
@@ -59,6 +60,8 @@ def clitest(
 
     result = CLITestResult()
     result.stdout = stdout.getvalue()
-    eq(stderr.getvalue(), '')
+    result.stderr = stderr.getvalue()
+    if not allow_stderr:
+        eq(result.stderr, '')
     eq(retcode, exit_status)
     return result

@@ -1,22 +1,30 @@
 import logging
 import optparse
 import sys
+import pkg_resources
 
 class MyFormatter(optparse.IndentedHelpFormatter):
     def format_epilog(self, epilog):
         return epilog
+
+def subcommands():
+    for entrypoint in \
+            pkg_resources.iter_entry_points('bugit.command'):
+        fn = entrypoint.load()
+        yield (entrypoint.name, fn.__doc__)
 
 def main():
     logging.basicConfig()
 
     parser = optparse.OptionParser(
         usage='%prog COMMAND [ARGS]',
-        #TODO generate epilog list
-        epilog="""
-Common commands include:
-  list\tList tickets matching given criteria
-  show\tShow details of a ticket
-""",
+        epilog=("\nCommon commands include:\n"
+                + '\n'.join([
+                    '  %s\t%s' % (name, blurb)
+                    for (name, blurb) in sorted(subcommands())
+                    ])
+                + '\n'
+                ),
         formatter=MyFormatter(),
         )
     my_options = []
@@ -31,4 +39,10 @@ Common commands include:
         parser.print_help()
         sys.exit(1)
 
-    raise NotImplementedError
+    command = args.pop(0)
+    for entrypoint in \
+            pkg_resources.iter_entry_points('bugit.command', command):
+        fn = entrypoint.load()
+        return fn(args)
+
+    parser.error('Unknown command: %s' % command)

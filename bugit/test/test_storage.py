@@ -9,22 +9,9 @@ from bugit import storage
 
 from bugit.test import util
 
-def git_init(path):
-    returncode = subprocess.call(
-        args=[
-            'git',
-            'init',
-            '--quiet',
-            ],
-        cwd=path,
-        close_fds=True,
-        )
-    eq(returncode, 0)
-
-
 def test_transaction_abort():
     tmp = util.maketemp()
-    git_init(tmp)
+    storage.git_init(tmp)
     storage.init(tmp)
     class MyException(Exception):
         pass
@@ -38,14 +25,14 @@ def test_transaction_abort():
 
 def test_transaction_nop():
     tmp = util.maketemp()
-    git_init(tmp)
+    storage.git_init(tmp)
     storage.init(tmp)
     with storage.Transaction(tmp) as t:
         pass
 
 def test_init():
     tmp = util.maketemp()
-    git_init(tmp)
+    storage.git_init(tmp)
     storage.init(tmp)
 
     assert os.path.isdir(os.path.join(tmp, '.git', 'bugit'))
@@ -74,7 +61,7 @@ def test_init():
 
 def test_transaction_set_simple():
     tmp = util.maketemp()
-    git_init(tmp)
+    storage.git_init(tmp)
     storage.init(tmp)
     with storage.Transaction(tmp) as t:
         t.set(
@@ -89,7 +76,7 @@ def test_transaction_set_simple():
 
 def test_ls_simple():
     tmp = util.maketemp()
-    git_init(tmp)
+    storage.git_init(tmp)
     storage.init(tmp)
     with storage.Transaction(tmp) as t:
         t.set(
@@ -110,7 +97,7 @@ def test_ls_simple():
 
 def test_rm_simple():
     tmp = util.maketemp()
-    git_init(tmp)
+    storage.git_init(tmp)
     storage.init(tmp)
     with storage.Transaction(tmp) as t:
         t.set(

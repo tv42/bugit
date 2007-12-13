@@ -5,6 +5,18 @@ import subprocess
 
 from bugit import util
 
+def git_init(repo):
+    returncode = subprocess.call(
+        args=[
+            'git',
+            'init',
+            '--quiet',
+            ],
+        cwd=repo,
+        close_fds=True,
+        )
+    if returncode != 0:
+        raise RuntimeError('git init failed')
 
 def git_rev_parse(rev, repo=None):
     if repo is None:

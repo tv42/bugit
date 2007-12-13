@@ -1,5 +1,6 @@
 import optparse
 import os
+import textwrap
 
 from bugit import storage
 from bugit import tagsort
@@ -67,4 +68,9 @@ def main(args):
             number=number,
             title=title,
             )
-        print '  %s' % ' '.join(tags)
+        print textwrap.fill(
+            ' '.join(tags),
+            initial_indent='  ',
+            subsequent_indent='  ',
+            break_long_words=False,
+            )

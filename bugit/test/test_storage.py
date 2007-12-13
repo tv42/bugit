@@ -69,8 +69,8 @@ def test_transaction_set_simple():
             'mockdata\n',
             )
     got = storage.get(
-        tmp,
-        'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
+        path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
+        repo=tmp,
         )
     eq(got, 'mockdata\n')
 
@@ -91,7 +91,10 @@ def test_ls_simple():
             '5d6d80d51c73ea24e47f2de6f207b9de5479b6b2/quux',
             'distraction\n',
             )
-    got = storage.ls(tmp, 'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411')
+    got = storage.ls(
+        path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411',
+        repo=tmp,
+        )
     got = sorted(got)
     eq(got, sorted(['xyzzy', 'quux']))
 
@@ -112,11 +115,17 @@ def test_rm_simple():
             '5d6d80d51c73ea24e47f2de6f207b9de5479b6b2/quux',
             'distraction\n',
             )
-    got = storage.ls(tmp, 'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411')
+    got = storage.ls(
+        path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411',
+        repo=tmp,
+        )
     got = sorted(got)
     eq(got, sorted(['xyzzy', 'quux']))
     with storage.Transaction(tmp) as t:
         t.rm('f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/quux')
-    got = storage.ls(tmp, 'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411')
+    got = storage.ls(
+        path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411',
+        repo=tmp,
+        )
     got = list(got)
     eq(got, ['xyzzy'])

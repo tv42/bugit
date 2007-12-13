@@ -184,10 +184,12 @@ def init(repo):
         if returncode != 0:
             raise RuntimeError('git symbolic-ref failed')
 
-def get(repo, path, rev=None):
+def get(path, rev=None, repo=None):
     """Get value of variable, for pure read-only use."""
     if rev is None:
         rev = 'refs/bugit/HEAD'
+    if repo is None:
+        repo = '.'
     for (mode, type_, object, basename) in git_ls_tree(
         path=path,
         treeish=rev,
@@ -274,10 +276,12 @@ def git_ls_tree(
     if returncode != 0:
         raise RuntimeError('git ls-tree failed')
 
-def ls(repo, path, rev=None):
+def ls(path, rev=None, repo=None):
     """Generate names of variables, for pure read-only use."""
     if rev is None:
         rev = 'refs/bugit/HEAD'
+    if repo is None:
+        repo = '.'
     assert not path.endswith('/')
     path = path+'/'
     process = subprocess.Popen(
@@ -450,9 +454,9 @@ class Transaction(object):
 
     def get(self, path):
         return get(
+            path=path,
             repo=self.repo,
             head=self.head,
-            path=path,
             )
 
     def _record(self, path, content):

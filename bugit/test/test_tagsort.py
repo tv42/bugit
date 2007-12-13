@@ -11,3 +11,8 @@ def test_priority_first():
     got = tagsort.human_friendly_tagsort(
         ['quux', 'priority:foo', 'bar', 'foo'])
     eq(got, ['priority:foo', 'bar', 'foo', 'quux'])
+
+def test_unknown_semicolons_last():
+    got = tagsort.human_friendly_tagsort(
+        ['quux', 'froop:foo', 'bar', 'foo'])
+    eq(got, ['bar', 'foo', 'quux', 'froop:foo'])

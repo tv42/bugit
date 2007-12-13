@@ -78,6 +78,7 @@ def clitest(
     args,
     exit_status=None,
     allow_stderr=False,
+    cwd=None,
     ):
     if exit_status is None:
         exit_status = 0
@@ -99,13 +100,20 @@ def clitest(
         sys.argv, args,
         )
     try:
+        olddir = os.open('.', os.O_RDONLY|os.O_DIRECTORY)
+        if cwd is not None:
+            os.chdir(cwd)
         try:
-            retcode = script()
-        except SystemExit, e:
-            retcode = e.code
-        else:
-            if retcode is None:
-                retcode = 0
+            try:
+                retcode = script()
+            except SystemExit, e:
+                retcode = e.code
+            else:
+                if retcode is None:
+                    retcode = 0
+        finally:
+            os.fchdir(olddir)
+            os.close(olddir)
     finally:
         (sys.stdin,
          sys.stdout,

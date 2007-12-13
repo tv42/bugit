@@ -1,4 +1,8 @@
+from __future__ import with_statement
+
 from nose.tools import eq_ as eq
+
+from bugit import storage
 
 from bugit.test import util
 
@@ -21,11 +25,40 @@ Options:
   --show=FIELD   show field in listing
 """)
 
+def test_empty():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    result = util.clitest(
+        args=[
+            'list',
+            ],
+        cwd=tmp,
+        )
+    eq(result.stdout, '')
+
 def test_no_match():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/number',
+            '3431\n',
+            )
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/title',
+            'I am not a xyzzy bug\n',
+            )
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/tags/quux',
+            '',
+            )
     result = util.clitest(
         args=[
             'list',
             '--tag=xyzzy',
             ],
+        cwd=tmp,
         )
     eq(result.stdout, '')

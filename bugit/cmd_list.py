@@ -55,6 +55,14 @@ def main(args):
             if not tags & must:
                 continue
         tags = tagsort.human_friendly_tagsort(tags)
+        if options.verbose:
+            raise NotImplementedError
+        if options.order:
+            raise NotImplementedError
+        if options.show:
+            raise NotImplementedError
+        if options.hide:
+            raise NotImplementedError
         print '#%(number)s\t%(title)s' % dict(
             number=number,
             title=title,

@@ -62,3 +62,39 @@ def test_no_match():
         cwd=tmp,
         )
     eq(result.stdout, '')
+
+def test_simple():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/number',
+            '3431\n',
+            )
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/title',
+            'Oncolator segfaults on some inputs\n',
+            )
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/tags/priority:high',
+            '',
+            )
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/tags/denial-of-service',
+            '',
+            )
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/tags/security',
+            '',
+            )
+    result = util.clitest(
+        args=[
+            'list',
+            ],
+        cwd=tmp,
+        )
+    eq(result.stdout, """\
+#3431	Oncolator segfaults on some inputs
+  priority:high denial-of-service security
+""")

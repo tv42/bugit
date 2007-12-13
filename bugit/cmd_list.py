@@ -1,4 +1,8 @@
 import optparse
+import os
+
+from bugit import storage
+from bugit import tagsort
 
 def main(args):
     """List tickets matching given criteria"""
@@ -35,4 +39,24 @@ def main(args):
         raise NotImplementedError(
             'TODO Full text search not supported yet.')
 
-    #raise NotImplementedError('TODO')
+    def list_tickets():
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            children=True,
+            ):
+            yield basename
+
+    for ticket in list_tickets():
+        number = storage.get(os.path.join(ticket, 'number')).rstrip()
+        title = storage.get(os.path.join(ticket, 'title')).rstrip()
+        tags = set(storage.ls(os.path.join(ticket, 'tags')))
+        if options.tag:
+            must = frozenset(options.tag)
+            if not tags & must:
+                continue
+        tags = tagsort.human_friendly_tagsort(tags)
+        print '#%(number)s\t%(title)s' % dict(
+            number=number,
+            title=title,
+            )
+        print '  %s' % ' '.join(tags)

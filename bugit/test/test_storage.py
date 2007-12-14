@@ -34,30 +34,7 @@ def test_init():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-
-    assert os.path.isdir(os.path.join(tmp, '.git', 'bugit'))
-    eq(os.listdir(os.path.join(tmp, '.git', 'bugit')), [])
-
-    sha = storage.git_rev_parse(
-        rev='refs/bugit/master',
-        repo=tmp,
-        )
-    assert sha is not None
-
-    process = subprocess.Popen(
-        args=[
-            'git',
-            'symbolic-ref',
-            'refs/bugit/HEAD',
-            ],
-        cwd=tmp,
-        close_fds=True,
-        stdout=subprocess.PIPE,
-        )
-    got = process.stdout.read()
-    returncode = process.wait()
-    eq(returncode, 0)
-    eq(got, 'refs/bugit/master\n')
+    util.check_bugit_repository(repo=tmp)
 
 def test_transaction_set_simple():
     tmp = util.maketemp()

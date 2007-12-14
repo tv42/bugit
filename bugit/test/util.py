@@ -4,10 +4,12 @@ import errno
 import os
 import pkg_resources
 import shutil
+import subprocess
 import sys
 
 from cStringIO import StringIO
 
+from bugit import storage
 from bugit.util import mkdir
 
 def find_test_name():
@@ -133,3 +135,28 @@ def clitest(
         eq(result.stderr, '')
     eq(retcode, exit_status)
     return result
+
+def check_bugit_repository(repo):
+    assert os.path.isdir(os.path.join(repo, '.git', 'bugit'))
+    eq(os.listdir(os.path.join(repo, '.git', 'bugit')), [])
+
+    sha = storage.git_rev_parse(
+        rev='refs/bugit/master',
+        repo=repo,
+        )
+    assert sha is not None
+
+    process = subprocess.Popen(
+        args=[
+            'git',
+            'symbolic-ref',
+            'refs/bugit/HEAD',
+            ],
+        cwd=repo,
+        close_fds=True,
+        stdout=subprocess.PIPE,
+        )
+    got = process.stdout.read()
+    returncode = process.wait()
+    eq(returncode, 0)
+    eq(got, 'refs/bugit/master\n')

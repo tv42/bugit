@@ -9,8 +9,9 @@ Options:
   -h, --help  show this help message and exit
 
 Common commands include:
-  list	List tickets matching given criteria
-  show	Show details of a ticket
+  init\tInitialize git repository for bugit use
+  list\tList tickets matching given criteria
+  show\tShow details of a ticket
 """
 
 def test_no_args():

@@ -95,7 +95,7 @@ def test_simple():
         cwd=tmp,
         )
     eq(result.stdout, """\
-#3431	Oncolator segfaults on some inputs
+#3431\tOncolator segfaults on some inputs
   priority:high denial-of-service security
 """)
 
@@ -139,7 +139,7 @@ def test_tag_wrap():
         cwd=tmp,
         )
     eq(result.stdout, """\
-#3431	Oncolator segfaults on some inputs
+#3431\tOncolator segfaults on some inputs
   priority:high blah-blah-blah denial-of-service lots-of-long-tickets
   security
 """)

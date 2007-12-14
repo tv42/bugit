@@ -355,9 +355,11 @@ class Transaction(object):
 
     def __init__(
         self,
-        repo,
+        repo=None,
         message=None,
         ):
+        if repo is None:
+            repo = '.'
         self.repo = repo
         self.message = message
 

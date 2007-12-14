@@ -128,7 +128,10 @@ def init(repo):
     util.mkdir(os.path.join(repo, '.git', 'bugit'))
 
     # does refs/bugit/master exist?
-    if git_rev_parse('refs/bugit/master') is None:
+    if git_rev_parse(
+        rev='refs/bugit/master',
+        repo=repo,
+        ) is None:
         # it did not, so create it
 
         # first create empty tree

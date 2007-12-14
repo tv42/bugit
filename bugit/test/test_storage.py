@@ -36,6 +36,14 @@ def test_init():
     storage.init(tmp)
     util.check_bugit_repository(repo=tmp)
 
+def test_init_repeat():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    util.check_bugit_repository(repo=tmp)
+    storage.init(tmp)
+    util.check_bugit_repository(repo=tmp)
+
 def test_transaction_set_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)

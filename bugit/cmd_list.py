@@ -4,6 +4,7 @@ import textwrap
 
 from bugit import storage
 from bugit import tagsort
+from bugit import util
 
 def main(args):
     """List tickets matching given criteria"""
@@ -49,7 +50,7 @@ def main(args):
 
     for ticket in list_tickets():
         number = storage.get(os.path.join(ticket, 'number')).rstrip()
-        title = storage.get(os.path.join(ticket, 'title')).rstrip()
+        description = storage.get(os.path.join(ticket, 'description')).rstrip()
         tags = set(storage.ls(os.path.join(ticket, 'tags')))
         if options.tag:
             must = frozenset(options.tag)
@@ -64,6 +65,7 @@ def main(args):
             raise NotImplementedError
         if options.hide:
             raise NotImplementedError
+        (title, description) = util.extract_title(description)
         print '#%(number)s\t%(title)s' % dict(
             number=number,
             title=title,

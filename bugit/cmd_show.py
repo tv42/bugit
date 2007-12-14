@@ -4,6 +4,7 @@ import textwrap
 
 from bugit import storage
 from bugit import tagsort
+from bugit import util
 
 def main(args):
     """Show details of a ticket"""
@@ -63,10 +64,10 @@ def main(args):
                 )
             print 'seen build/301' #TODO
             print
-            title = storage.get(os.path.join(ticket, 'title')).rstrip()
+            description = storage.get(os.path.join(ticket, 'description')).rstrip()
+            (title, description) = util.extract_title(description)
             print '\t%s' % title
             print
-            description = storage.get(os.path.join(ticket, 'description')).rstrip()
             if description is not None:
                 print '\n'.join([
                         '\t%s' % line
@@ -77,7 +78,6 @@ def main(args):
                 for name in storage.ls(ticket):
                     if name in [
                         'number',
-                        'title',
                         'description',
                         ]:
                         continue

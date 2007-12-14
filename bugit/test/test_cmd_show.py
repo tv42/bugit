@@ -64,10 +64,6 @@ def test_simple():
             '3431\n',
             )
         t.set(
-            'd239371f3b6b61ca1076bb460e331b3edb412970/title',
-            'Oncolator segfaults on some inputs\n',
-            )
-        t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/tags/priority:high',
             '',
             )
@@ -86,6 +82,8 @@ def test_simple():
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/description',
             """\
+Oncolator segfaults on some inputs
+
 The Oncolator service segfaults if I go to the web page,
 login, choose quick oncolation from the radio buttons and
 click the "Onc!" button.

@@ -47,7 +47,7 @@ def test_no_match():
             '3431\n',
             )
         t.set(
-            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/title',
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/description',
             'I am not a xyzzy bug\n',
             )
         t.set(
@@ -73,8 +73,18 @@ def test_simple():
             '3431\n',
             )
         t.set(
-            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/title',
-            'Oncolator segfaults on some inputs\n',
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/description',
+            """\
+Oncolator segfaults on some inputs
+
+The Oncolator service segfaults if I go to the web page,
+login, choose quick oncolation from the radio buttons and
+click the "Onc!" button.
+
+I need to demo this to the Board of Directors on Monday, need a
+fix quick! It crashed on me today around 9:20 am, you should be
+able to find it in the server logs.
+""",
             )
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/tags/priority:high',
@@ -109,8 +119,18 @@ def test_tag_wrap():
             '3431\n',
             )
         t.set(
-            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/title',
-            'Oncolator segfaults on some inputs\n',
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/description',
+            """\
+Oncolator segfaults on some inputs
+
+The Oncolator service segfaults if I go to the web page,
+login, choose quick oncolation from the radio buttons and
+click the "Onc!" button.
+
+I need to demo this to the Board of Directors on Monday, need a
+fix quick! It crashed on me today around 9:20 am, you should be
+able to find it in the server logs.
+""",
             )
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/tags/priority:high',

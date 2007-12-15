@@ -7,11 +7,15 @@ from bugit import storage
 from bugit.test import util
 
 def test_help():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
     result = util.clitest(
         args=[
             'show',
             '--help',
             ],
+        cwd=tmp,
         )
     eq(result.stdout, """\
 Usage: bugit show [OPTS] [--] [TICKET]
@@ -23,10 +27,14 @@ Options:
 """)
 
 def test_bad_no_default_ticket():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
     result = util.clitest(
         args=[
             'show',
             ],
+        cwd=tmp,
         exit_status=2,
         allow_stderr=True,
         )
@@ -38,12 +46,16 @@ bugit: error: no default ticket set
 """)
 
 def test_bad_too_many_args():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
     result = util.clitest(
         args=[
             'show',
             'foo',
             'bar',
             ],
+        cwd=tmp,
         exit_status=2,
         allow_stderr=True,
         )

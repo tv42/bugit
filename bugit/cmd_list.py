@@ -49,7 +49,12 @@ def main(args):
             yield basename
 
     for ticket in list_tickets():
-        number = storage.get(os.path.join(ticket, 'number')).rstrip()
+        number = storage.get(os.path.join(ticket, 'number'))
+        if number is not None:
+            number = number.rstrip()
+            ident = '#%s' % number
+        else:
+            ident = ticket[:7]
         description = storage.get(os.path.join(ticket, 'description')).rstrip()
         tags = set(storage.ls(os.path.join(ticket, 'tags')))
         if options.tag:
@@ -66,13 +71,14 @@ def main(args):
         if options.hide:
             raise NotImplementedError
         (title, description) = util.extract_title(description)
-        print '#%(number)s\t%(title)s' % dict(
-            number=number,
+        print '%(ident)s\t%(title)s' % dict(
+            ident=ident,
             title=title,
             )
-        print textwrap.fill(
-            ' '.join(tags),
-            initial_indent='  ',
-            subsequent_indent='  ',
-            break_long_words=False,
-            )
+        if description is not None:
+            print textwrap.fill(
+                ' '.join(tags),
+                initial_indent='  ',
+                subsequent_indent='  ',
+                break_long_words=False,
+                )

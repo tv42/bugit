@@ -163,3 +163,47 @@ able to find it in the server logs.
   priority:high blah-blah-blah denial-of-service lots-of-long-tickets
   security
 """)
+
+def test_no_number():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/description',
+            """\
+Oncolator segfaults on some inputs
+
+The Oncolator service segfaults if I go to the web page,
+login, choose quick oncolation from the radio buttons and
+click the "Onc!" button.
+
+I need to demo this to the Board of Directors on Monday, need a
+fix quick! It crashed on me today around 9:20 am, you should be
+able to find it in the server logs.
+""",
+            )
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/tags/priority:high',
+            '',
+            )
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/tags/denial-of-service',
+            '',
+            )
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/tags/security',
+            '',
+            )
+    result = util.clitest(
+        args=[
+            'list',
+            ],
+        cwd=tmp,
+        )
+    # with no number or name, default to 7-digit prefix of ticket,
+    # similar to git rev-parse --short
+    eq(result.stdout, """\
+f3da69c\tOncolator segfaults on some inputs
+  priority:high denial-of-service security
+""")

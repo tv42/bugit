@@ -25,4 +25,7 @@ def extract_title(description):
 
         l.append(line)
 
+    if not l:
+        l = [description.rstrip()]
+        description = None
     return ('\n'.join(l), description)

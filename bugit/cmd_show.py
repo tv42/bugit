@@ -113,13 +113,13 @@ def main(args):
             )
     tags = set(storage.ls(os.path.join(ticket, 'tags')))
     if tags:
-                tags = tagsort.human_friendly_tagsort(tags)
-                print textwrap.fill(
-                    ' '.join(tags),
-                    initial_indent='tags ',
-                    subsequent_indent='     ',
-                    break_long_words=False,
-                    )
+        tags = tagsort.human_friendly_tagsort(tags)
+        print textwrap.fill(
+            ' '.join(tags),
+            initial_indent='tags ',
+            subsequent_indent='     ',
+            break_long_words=False,
+            )
     print 'seen build/301' #TODO
     print
     description = storage.get(os.path.join(ticket, 'description')).rstrip()

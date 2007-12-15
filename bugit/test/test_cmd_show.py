@@ -331,6 +331,7 @@ Oncolator segfaults on some inputs
         )
     eq(result.stdout, """\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
+name oncolator-segfault
 seen build/301
 
 \tOncolator segfaults on some inputs

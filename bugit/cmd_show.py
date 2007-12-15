@@ -103,6 +103,14 @@ def main(args):
     if number is not None:
         number = number.rstrip()
         print 'number #%s' % number
+    names = sorted(storage.ls(os.path.join(ticket, 'name')))
+    if names:
+        print textwrap.fill(
+            ' '.join(names),
+            initial_indent='name ',
+            subsequent_indent='     ',
+            break_long_words=False,
+            )
     tags = set(storage.ls(os.path.join(ticket, 'tags')))
     if tags:
                 tags = tagsort.human_friendly_tagsort(tags)

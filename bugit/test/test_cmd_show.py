@@ -66,6 +66,91 @@ Usage: bugit show [OPTS] [TICKET]
 bugit: error: too many arguments
 """)
 
+def test_not_found_sha():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    result = util.clitest(
+        args=[
+            'show',
+            '1111111111111111111111111111111111111111'
+            ],
+        cwd=tmp,
+        exit_status=1,
+        allow_stderr=True,
+        )
+    eq(result.stdout, '')
+    eq(result.stderr, """\
+bugit: ticket not found: 1111111111111111111111111111111111111111
+""")
+
+def test_not_found_number():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    result = util.clitest(
+        args=[
+            'show',
+            '#11'
+            ],
+        cwd=tmp,
+        exit_status=1,
+        allow_stderr=True,
+        )
+    eq(result.stdout, '')
+    eq(result.stderr, """\
+bugit: ticket not found: #11
+""")
+
+def test_ambiguous():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            """\
+Foo
+""",
+            )
+        t.set(
+            'd23959133fdca3611368d192bf6de4157a54d7a5/description',
+            """\
+Bar
+""",
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'd239'
+            ],
+        cwd=tmp,
+        exit_status=1,
+        allow_stderr=True,
+        )
+    eq(result.stdout, '')
+    eq(result.stderr, """\
+bugit: matches more than one ticket: d239
+""")
+
+def test_not_found_name():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    result = util.clitest(
+        args=[
+            'show',
+            'foo'
+            ],
+        cwd=tmp,
+        exit_status=1,
+        allow_stderr=True,
+        )
+    eq(result.stdout, '')
+    eq(result.stderr, """\
+bugit: ticket not found: foo
+""")
+
 def test_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)
@@ -164,6 +249,88 @@ Oncolator segfaults on some inputs
     eq(result.stdout, """\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 number #3431
+seen build/301
+
+\tOncolator segfaults on some inputs
+""",
+       'stdout does not match:\n%s' % result.stdout)
+
+def test_lookup_sha():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            """\
+Oncolator segfaults on some inputs
+""",
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'd239371f3b6b61ca1076bb460e331b3edb412970',
+            ],
+        cwd=tmp,
+        )
+    eq(result.stdout, """\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
+seen build/301
+
+\tOncolator segfaults on some inputs
+""",
+       'stdout does not match:\n%s' % result.stdout)
+
+def test_lookup_sha_abbreviated_4():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            """\
+Oncolator segfaults on some inputs
+""",
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'd239',
+            ],
+        cwd=tmp,
+        )
+    eq(result.stdout, """\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
+seen build/301
+
+\tOncolator segfaults on some inputs
+""",
+       'stdout does not match:\n%s' % result.stdout)
+
+def test_lookup_name():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            """\
+Oncolator segfaults on some inputs
+""",
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/name/oncolator-segfault',
+            '',
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'oncolator-segfault',
+            ],
+        cwd=tmp,
+        )
+    eq(result.stdout, """\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
 \tOncolator segfaults on some inputs

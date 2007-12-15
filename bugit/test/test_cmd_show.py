@@ -138,3 +138,34 @@ browser=
 \tFirefox/2.0.0.6 (Ubuntu-feisty)
 """,
        'stdout does not match:\n%s' % result.stdout)
+
+def test_minimal_with_number():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/number',
+            '3431\n',
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            """\
+Oncolator segfaults on some inputs
+""",
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            '#3431',
+            ],
+        cwd=tmp,
+        )
+    eq(result.stdout, """\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
+number #3431
+seen build/301
+
+\tOncolator segfaults on some inputs
+""",
+       'stdout does not match:\n%s' % result.stdout)

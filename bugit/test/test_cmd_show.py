@@ -18,7 +18,7 @@ def test_help():
         cwd=tmp,
         )
     eq(result.stdout, """\
-Usage: bugit show [OPTS] [--] [TICKET]
+Usage: bugit show [OPTS] [TICKET]
 
 Options:
   -h, --help       show this help message and exit
@@ -40,7 +40,7 @@ def test_bad_no_default_ticket():
         )
     eq(result.stdout, '')
     eq(result.stderr, """\
-Usage: bugit show [OPTS] [--] [TICKET]
+Usage: bugit show [OPTS] [TICKET]
 
 bugit: error: no default ticket set
 """)
@@ -61,7 +61,7 @@ def test_bad_too_many_args():
         )
     eq(result.stdout, '')
     eq(result.stderr, """\
-Usage: bugit show [OPTS] [--] [TICKET]
+Usage: bugit show [OPTS] [TICKET]
 
 bugit: error: too many arguments
 """)

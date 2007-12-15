@@ -9,7 +9,7 @@ from bugit import util
 def main(args):
     """Show details of a ticket"""
     parser = optparse.OptionParser(
-        usage='%prog show [OPTS] [--] [TICKET]',
+        usage='%prog show [OPTS] [TICKET]',
         )
     parser.add_option(
         '-v', '--verbose',

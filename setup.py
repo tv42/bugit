@@ -26,6 +26,7 @@ repository that houses your code.
             ],
         'bugit.command': [
             'init = bugit.cmd_init:main',
+            'new = bugit.cmd_new:main',
             'list = bugit.cmd_list:main',
             'show = bugit.cmd_show:main',
             ],

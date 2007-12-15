@@ -11,6 +11,7 @@ Options:
 Common commands include:
   init\tInitialize git repository for bugit use
   list\tList tickets matching given criteria
+  new\tCreate a new ticket
   show\tShow details of a ticket
 """
 
@@ -19,7 +20,11 @@ def test_no_args():
         args=[],
         exit_status=1,
         )
-    eq(result.stdout, USAGE)
+    eq(
+        result.stdout,
+        USAGE,
+        'stdout does not match:\n%s' % result.stdout,
+        )
 
 def test_global_help():
     result = util.clitest(
@@ -27,7 +32,11 @@ def test_global_help():
             '--help',
             ],
         )
-    eq(result.stdout, USAGE)
+    eq(
+        result.stdout,
+        USAGE,
+        'stdout does not match:\n%s' % result.stdout,
+       )
 
 def test_bad_command():
     result = util.clitest(

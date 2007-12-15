@@ -78,17 +78,20 @@ def _get_script():
 
 def clitest(
     args,
+    stdin=None,
     exit_status=None,
     allow_stderr=False,
     cwd=None,
     ):
+    if stdin is None:
+        stdin = ''
     if exit_status is None:
         exit_status = 0
 
     args = ['bugit']+args
     script = _get_script()
 
-    stdin = StringIO('')
+    stdin = StringIO(stdin)
     stdout = StringIO()
     stderr = StringIO()
     (old_stdin, sys.stdin,

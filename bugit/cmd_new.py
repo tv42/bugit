@@ -19,8 +19,10 @@ def main(args):
     if args:
         raise NotImplementedError()
 
-    # TODO plug in an editor
-    description = sys.stdin.read()
+    if sys.stdin.isatty():
+        raise NotImplementedError('TODO plug in an editor')
+    else:
+        description = sys.stdin.read()
 
     # i though of using the sha1 of the subtree of the ticket as the
     # ticket name, but that makes e.g. two "echo|bugit new" runs

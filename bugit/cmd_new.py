@@ -2,6 +2,7 @@ from __future__ import with_statement
 
 import optparse
 import os
+import random
 import sys
 import textwrap
 
@@ -21,9 +22,14 @@ def main(args):
     # TODO plug in an editor
     description = sys.stdin.read()
 
+    # i though of using the sha1 of the subtree of the ticket as the
+    # ticket name, but that makes e.g. two "echo|bugit new" runs
+    # create conflicting tickets.. just picking a random sha seems
+    # simpler and should make accidental conflicts very rare
+    ticket = '%040x' % random.getrandbits(160)
     with storage.Transaction('.') as t:
         t.set(
-            '0000000000000000000000000000000000000000/description',
+            os.path.join(ticket, 'description'),
             description,
             )
-    print 'Saved ticket 0000000000000000000000000000000000000000'
+    print 'Saved ticket %s' % ticket

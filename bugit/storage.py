@@ -42,9 +42,6 @@ def git_rev_parse(rev, repo=None):
     return sha
 
 def git_mktree(children, repo=None):
-    """
-    Children must be sorted already.
-    """
     if repo is None:
         repo = '.'
     process = subprocess.Popen(
@@ -424,13 +421,11 @@ class Transaction(object):
                 child_sha = self._write_object(v)
                 children[k] = ('100644', 'blob', child_sha)
 
-        def g():
-            for (name, (mode, type_, object)) \
-                    in sorted(children.items()):
-                yield (mode, type_, object, name)
-
         sha = git_mktree(
-            children=g(),
+            children=(
+                (mode, type_, object, name)
+                for (name, (mode, type_, object)) in children.items()
+                ),
             repo=self.repo,
             )
         return sha

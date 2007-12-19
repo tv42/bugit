@@ -155,16 +155,15 @@ def main(args):
             if not content:
                 print name
             elif '\n' not in content:
-                # one line with optional newline
-                oneline = '%s=%s' % (name, content)
-                if len(oneline) <= 70:
-                    # short enough to fit on one line
-                    print oneline
-                else:
-                    print '%s=' % name
-                    print '\n'.join(textwrap.wrap(
+                # one line with optional newline; distinguishable from
+                # multiple lines by value starting on the same line,
+                # even if it is wordwrapped for display
+
+                # presence of final newline is not encoded in any way,
+                # on purpose.
+                print '\n'.join(textwrap.wrap(
                         content,
-                        initial_indent='\t',
+                        initial_indent='%s=' % name,
                         subsequent_indent='\t',
                         break_long_words=False,
                         ))

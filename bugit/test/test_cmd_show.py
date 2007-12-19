@@ -218,9 +218,8 @@ seen build/301
 \tfix quick! It crashed on me today around 9:20 am, you should be
 \table to find it in the server logs.
 
-browser=
-\tMozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20061201
-\tFirefox/2.0.0.6 (Ubuntu-feisty)
+browser=Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6)
+\tGecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)
 """,
        'stdout does not match:\n%s' % result.stdout)
 
@@ -361,5 +360,127 @@ name oncolator-segfault
 seen build/301
 
 \tOncolator segfaults on some inputs
+""",
+       'stdout does not match:\n%s' % result.stdout)
+
+def test_variable_short():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            """\
+Oncolator segfaults on some inputs
+""",
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/answer',
+            "42\n",
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'd239',
+            ],
+        cwd=tmp,
+        )
+    eq(result.stdout, """\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
+seen build/301
+
+\tOncolator segfaults on some inputs
+
+answer=42
+""",
+       'stdout does not match:\n%s' % result.stdout)
+
+def test_variable_long():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            """\
+Oncolator segfaults on some inputs
+""",
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/ashortone',
+            # just short enough not to wrap
+            ((70 - len('something=')) * 'x') + '\n',
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/longerone',
+            # just one too long
+            ((71 - len('longerone=')) * 'x') + '\n',
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/toolong',
+            50*'foo ',
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'd239',
+            ],
+        cwd=tmp,
+        )
+    eq(result.stdout, """\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
+seen build/301
+
+\tOncolator segfaults on some inputs
+
+ashortone=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+longerone=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+toolong=foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+\tfoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+\tfoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
+\tfoo
+""",
+       'stdout does not match:\n%s' % result.stdout)
+
+def test_variable_multiline():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            """\
+Oncolator segfaults on some inputs
+""",
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/multiline',
+            """\
+I consist of
+multiple lines
+and my formatting
+is precious and
+dear to author
+"""
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'd239',
+            ],
+        cwd=tmp,
+        )
+    eq(result.stdout, """\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
+seen build/301
+
+\tOncolator segfaults on some inputs
+
+multiline=
+\tI consist of
+\tmultiple lines
+\tand my formatting
+\tis precious and
+\tdear to author
 """,
        'stdout does not match:\n%s' % result.stdout)

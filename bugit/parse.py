@@ -167,7 +167,8 @@ def parse_ticket_raw(lines, strict=False):
                 v = ''
             value.append(v)
 
-    yield (variable, _process(value))
+    if variable is not None:
+        yield (variable, _process(value))
 
 def parse_ticket(fp):
     for (variable, value) in parse_ticket_raw(fp):

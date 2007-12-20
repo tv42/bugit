@@ -1,6 +1,6 @@
 from __future__ import with_statement
 
-from nose.tools import eq_ as eq, raises
+from nose.tools import eq_ as eq, assert_raises
 
 from cStringIO import StringIO
 
@@ -15,7 +15,7 @@ def next(g, variable, value=''):
 def test_empty():
     fp = StringIO('')
     g = parse.parse_ticket(fp)
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)
 
 def test_simple_raw():
     fp = StringIO("""\
@@ -55,7 +55,7 @@ fix quick! It crashed on me today around 9:20 am, you should be
 able to find it in the server logs.
 """)
     next(g, 'browser', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)\n')
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)
 
 def test_simple():
     fp = StringIO("""\
@@ -98,7 +98,7 @@ fix quick! It crashed on me today around 9:20 am, you should be
 able to find it in the server logs.
 """)
     next(g, 'browser', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)\n')
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)
 
 def test_simple_separator():
     fp = StringIO("""\
@@ -142,7 +142,7 @@ fix quick! It crashed on me today around 9:20 am, you should be
 able to find it in the server logs.
 """)
     next(g, 'browser', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)\n')
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)
 
 def test_noheader():
     fp = StringIO("""\
@@ -168,7 +168,7 @@ I need to demo this to the Board of Directors on Monday, need a
 fix quick! It crashed on me today around 9:20 am, you should be
 able to find it in the server logs.
 """)
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)
 
 def test_variablestyle():
     fp = StringIO("""\
@@ -214,7 +214,7 @@ a fix quick! It crashed on me today around 9:20 am, you should
 be able to find it in the server logs.
 """)
     next(g, 'browser', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)\n')
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)
 
 def test_continuation():
     fp = StringIO("""\
@@ -224,7 +224,7 @@ one=
 """)
     g = parse.parse_ticket(fp)
     next(g, 'one', 'foo\nbar\n')
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)
 
 def test_nontab():
     fp = StringIO("""\
@@ -238,7 +238,7 @@ two=
     g = parse.parse_ticket(fp)
     next(g, 'one', 'foo\nbar\n')
     next(g, 'two', 'foo\nbar\n')
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)
 
 def test_nontab_leadingspace():
     fp = StringIO("""\
@@ -252,7 +252,7 @@ two=
     g = parse.parse_ticket(fp)
     next(g, 'one', 'foo\n bar\n')
     next(g, 'two', ' foo\nbar\n')
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)
 
 def test_continuation_emptyline_withwhitespace():
     fp = StringIO("""\
@@ -262,7 +262,7 @@ one=
 """)
     g = parse.parse_ticket(fp)
     next(g, 'one', '\nbar\n')
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)
 
 def test_continuation_emptyline_nowhitespace():
     fp = StringIO("""\
@@ -272,4 +272,4 @@ one=
 """)
     g = parse.parse_ticket(fp)
     next(g, 'one', '\nbar\n')
-    raises(StopIteration, g.next)
+    assert_raises(StopIteration, g.next)

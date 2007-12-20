@@ -135,6 +135,42 @@ I ran frob and it was supposed to blarb, but it qwarked.
         )
     eq(got, '')
 
+def test_header_bad_ticket():
+    # can't include ticket sha for "bugit new"
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    result = util.clitest(
+        args=[
+            'new',
+            ],
+        stdin="""\
+ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+tags qwark
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""",
+        cwd=tmp,
+        allow_stderr=True,
+        exit_status=1,
+        )
+    eq(result.stdout, '')
+    eq(result.stderr, """\
+bugit new: cannot include ticket identity when creating ticket
+""")
+    def list_tickets():
+        # TODO share me
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            repo=tmp,
+            children=True,
+            ):
+            yield basename
+    got = list(list_tickets())
+    eq(got, [])
+
 def test_variables():
     tmp = util.maketemp()
     storage.git_init(tmp)

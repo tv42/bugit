@@ -208,16 +208,17 @@ tags priority:high denial-of-service security
      reporter:jdoe@example.com
 seen build/301
 
-\tOncolator segfaults on some inputs
+Oncolator segfaults on some inputs
 
-\tThe Oncolator service segfaults if I go to the web page,
-\tlogin, choose quick oncolation from the radio buttons and
-\tclick the "Onc!" button.
-\t
-\tI need to demo this to the Board of Directors on Monday, need a
-\tfix quick! It crashed on me today around 9:20 am, you should be
-\table to find it in the server logs.
+The Oncolator service segfaults if I go to the web page,
+login, choose quick oncolation from the radio buttons and
+click the "Onc!" button.
 
+I need to demo this to the Board of Directors on Monday, need a
+fix quick! It crashed on me today around 9:20 am, you should be
+able to find it in the server logs.
+
+--
 browser=Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6)
 \tGecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)
 """,
@@ -245,7 +246,9 @@ Oncolator segfaults on some inputs
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
-\tOncolator segfaults on some inputs
+Oncolator segfaults on some inputs
+
+--
 """,
        'stdout does not match:\n%s' % result.stdout)
 
@@ -276,7 +279,9 @@ ticket d239371f3b6b61ca1076bb460e331b3edb412970
 number #3431
 seen build/301
 
-\tOncolator segfaults on some inputs
+Oncolator segfaults on some inputs
+
+--
 """,
        'stdout does not match:\n%s' % result.stdout)
 
@@ -302,7 +307,9 @@ Oncolator segfaults on some inputs
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
-\tOncolator segfaults on some inputs
+Oncolator segfaults on some inputs
+
+--
 """,
        'stdout does not match:\n%s' % result.stdout)
 
@@ -328,7 +335,9 @@ Oncolator segfaults on some inputs
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
-\tOncolator segfaults on some inputs
+Oncolator segfaults on some inputs
+
+--
 """,
        'stdout does not match:\n%s' % result.stdout)
 
@@ -359,7 +368,9 @@ ticket d239371f3b6b61ca1076bb460e331b3edb412970
 name oncolator-segfault
 seen build/301
 
-\tOncolator segfaults on some inputs
+Oncolator segfaults on some inputs
+
+--
 """,
        'stdout does not match:\n%s' % result.stdout)
 
@@ -389,8 +400,9 @@ Oncolator segfaults on some inputs
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
-\tOncolator segfaults on some inputs
+Oncolator segfaults on some inputs
 
+--
 answer=42
 """,
        'stdout does not match:\n%s' % result.stdout)
@@ -431,8 +443,9 @@ Oncolator segfaults on some inputs
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
-\tOncolator segfaults on some inputs
+Oncolator segfaults on some inputs
 
+--
 ashortone=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 longerone=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 toolong=foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
@@ -474,8 +487,9 @@ dear to author
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
-\tOncolator segfaults on some inputs
+Oncolator segfaults on some inputs
 
+--
 multiline=
 \tI consist of
 \tmultiple lines

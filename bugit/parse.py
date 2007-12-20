@@ -121,18 +121,14 @@ def parse_ticket_raw(lines, strict=False):
         cur = len(lines)-1
         while cur >= 0:
             line = lines[cur]
-            print 'LINE', repr(line)
             if not line.rstrip() or line.startswith(('\t', ' ')):
                 # looks like continuation
-                print 'CONTINUATION'
                 pass
             elif _VARIABLE_RE.match(line):
                 # looks like a good variable
-                print 'VARIABLE'
                 start = cur
             else:
                 # not a valid variable line, stop here
-                print 'BAIL'
                 break
 
             cur -= 1
@@ -147,7 +143,6 @@ def parse_ticket_raw(lines, strict=False):
         del lines[-1]
     description = ''.join(lines)
     if description:
-        print 'DESC', repr(description)
         yield ('_description', description)
 
     variable = None

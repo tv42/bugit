@@ -123,14 +123,10 @@ def main(args):
     print 'seen build/301' #TODO
     print
     description = storage.get(os.path.join(ticket, 'description')).rstrip()
-    (title, description) = util.extract_title(description)
-    print '\t%s' % title
-    if description is not None:
+    if description:
+        print description
         print
-        print '\n'.join([
-                '\t%s' % line
-                for line in description.split('\n')
-                ])
+    print '--'
     def get_the_rest():
         for name in storage.ls(ticket):
             if name in [
@@ -149,7 +145,6 @@ def main(args):
             yield name
     the_rest = sorted(get_the_rest())
     if the_rest:
-        print
         for name in the_rest:
             content = storage.get(os.path.join(ticket, name)).rstrip()
             if not content:

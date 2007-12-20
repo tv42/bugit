@@ -7,6 +7,7 @@ import sys
 import textwrap
 
 from bugit import storage
+from bugit import parse
 from bugit import tagsort
 
 def main(args):
@@ -22,7 +23,7 @@ def main(args):
     if sys.stdin.isatty():
         raise NotImplementedError('TODO plug in an editor')
     else:
-        description = sys.stdin.read()
+        content = parse.parse_ticket(sys.stdin)
 
     # i though of using the sha1 of the subtree of the ticket as the
     # ticket name, but that makes e.g. two "echo|bugit new" runs
@@ -30,8 +31,9 @@ def main(args):
     # simpler and should make accidental conflicts very rare
     ticket = '%040x' % random.getrandbits(160)
     with storage.Transaction('.') as t:
-        t.set(
-            os.path.join(ticket, 'description'),
-            description,
-            )
+        for variable, value in content:
+            t.set(
+                os.path.join(ticket, variable),
+                value,
+                )
     print 'Saved ticket %s' % ticket

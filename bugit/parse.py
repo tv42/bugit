@@ -1,4 +1,6 @@
+import itertools
 import os
+import re
 
 def _strip_prefix(l):
     """
@@ -45,7 +47,10 @@ def _strip_prefix(l):
 def _process(value):
     if len(value) == 1:
         # single line not wordwrapped
-        return value[0] + '\n'
+        v = value[0]
+        if v:
+            v = v + '\n'
+        return v
     elif not value[0]:
         # multi-line
         # ignore the first (empty) line
@@ -59,67 +64,113 @@ def _process(value):
 
     return separator.join(value) + '\n'
 
-class _State(object):
-    def __init__(self, name):
-        self.__doc__ = name
-    def __str__(self):
-        return self.__doc__
+_HEADER_RE = re.compile(r'^(?P<command>[a-z_][a-z0-9_./@:-]*)(?:\s+(?P<value>.*))?$')
+_VARIABLE_RE = re.compile(r'^(?P<variable>[a-z_][a-z0-9_./@:-]*)(?:=(?P<value>.*))?$')
 
-MAYBE_HEADER = _State('MAYBE_HEADER')
-HEADER = _State('HEADER')
-DESCRIPTION = _State('DESCRIPTION')
-VARIABLES = _State('VARIABLES')
+def _parse_header(lines):
+    command = None
+    value = []
+    for line in lines:
+        line = line.rstrip()
+        if line.startswith(('\t', ' ')):
+            assert command is not None
+            value.append(line)
+            continue
+        if command is not None:
+            yield ('_%s' % command, _process(value))
+            command = None
+            value = []
+        if not line:
+            break
+        match = _HEADER_RE.match(line)
+        assert match is not None
+        command = match.group('command')
+        value = [match.group('value')]
 
-def parse_ticket_raw(fp):
-    state = MAYBE_HEADER
+def parse_ticket_raw(lines, strict=False):
+    # jump through hoops to peek at the iterator
+    try:
+        line = lines.next()
+    except StopIteration:
+        return
+    lines = itertools.chain([line], lines)
+
+    if strict or _HEADER_RE.match(line):
+        # looks like a header
+        for r in _parse_header(lines):
+            yield r
+
+    # slurp the rest in, we need to process it backwards
+    lines = list(lines)
+
+    # find the last "--", if any
+    separator = len(lines)-1
+    while separator >= 0:
+        if lines[separator].rstrip() == '--':
+            break
+        separator -= 1
+    if separator >= 0:
+        # found separator
+        variables = lines[separator+1:]
+        lines = lines[:separator]
+    else:
+        # no explicit separator found
+        if strict:
+            raise RuntimeError('Description must end with "--"')
+        start = None
+        cur = len(lines)-1
+        while cur >= 0:
+            line = lines[cur]
+            print 'LINE', repr(line)
+            if not line.rstrip() or line.startswith(('\t', ' ')):
+                # looks like continuation
+                print 'CONTINUATION'
+                pass
+            elif _VARIABLE_RE.match(line):
+                # looks like a good variable
+                print 'VARIABLE'
+                start = cur
+            else:
+                # not a valid variable line, stop here
+                print 'BAIL'
+                break
+
+            cur -= 1
+
+        if start is None:
+            variables = []
+        else:
+            variables = lines[start:]
+            lines = lines[:start]
+
+    while lines and lines[-1] == '\n':
+        del lines[-1]
+    description = ''.join(lines)
+    if description:
+        print 'DESC', repr(description)
+        yield ('_description', description)
+
     variable = None
     value = []
-    for line in fp:
+    for line in variables:
         line = line.rstrip()
 
-        if state is MAYBE_HEADER:
-            first_space = line.find(' ')
-            first_equals = line.find('=')
-            if (first_space != -1
-                and (first_equals == -1
-                     or first_space < first_equals)):
-                state = HEADER
-            else:
-                state = VARIABLES
-
-        if (state is HEADER
-            and not line):
-            if variable is not None:
-                yield (variable, _process(value))
-                variable = None
-                value = []
-            state = DESCRIPTION
-            variable = '_description'
-            value.append('')
-        elif not line or line.startswith(('\t', ' ')):
+        if not line or line.startswith(('\t', ' ')):
             assert variable is not None
             value.append(line)
         else:
             if variable is not None:
-                if state is DESCRIPTION:
-                    while not value[-1]:
-                        del value[-1]
                 yield (variable, _process(value))
                 variable = None
                 value = []
 
-            if '=' not in line:
-                if ' ' not in line:
-                    # empty value, cannot ever be multiline!
-                    yield (line, '')
-                else:
-                    k,v = line.split(' ', 1)
-                    variable = '_%s' % k
-                    value.append(v)
-            else:
-                k,v = line.split('=', 1)
-                variable = k
-                value.append(v)
+            match = _VARIABLE_RE.match(line)
+            assert match is not None
+            variable = match.group('variable')
+            v = match.group('value')
+            if v is None:
+                v = ''
+            value.append(v)
 
     yield (variable, _process(value))
 

@@ -113,6 +113,9 @@ def parse_ticket_raw(lines, strict=False):
         # found separator
         variables = lines[separator+1:]
         lines = lines[:separator]
+        # remove initial empty lines
+        while variables and not variables[0].rstrip():
+            del variables[0]
     else:
         # no explicit separator found
         if strict:

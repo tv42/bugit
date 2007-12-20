@@ -144,7 +144,7 @@ able to find it in the server logs.
     next(g, 'browser', 'Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)\n')
     assert_raises(StopIteration, g.next)
 
-def test_noheader():
+def test_only_description():
     fp = StringIO("""\
 Oncolator segfaults on some inputs
 
@@ -168,6 +168,66 @@ I need to demo this to the Board of Directors on Monday, need a
 fix quick! It crashed on me today around 9:20 am, you should be
 able to find it in the server logs.
 """)
+    assert_raises(StopIteration, g.next)
+
+def test_no_variables():
+    fp = StringIO("""\
+tags foo
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""")
+    g = parse.parse_ticket(fp)
+    next(g, 'tags/foo')
+    next(g, 'description', """\
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""")
+    assert_raises(StopIteration, g.next)
+
+def test_no_variables_withseparator():
+    fp = StringIO("""\
+tags foo
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+
+--
+
+
+""")
+    g = parse.parse_ticket(fp)
+    next(g, 'tags/foo')
+    next(g, 'description', """\
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""")
+    assert_raises(StopIteration, g.next)
+
+def test_variables_blank_after_separator():
+    fp = StringIO("""\
+tags foo
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+
+--
+
+foo=bar
+""")
+    g = parse.parse_ticket(fp)
+    next(g, 'tags/foo')
+    next(g, 'description', """\
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""")
+    next(g, 'foo', 'bar\n')
     assert_raises(StopIteration, g.next)
 
 def test_variablestyle():

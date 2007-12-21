@@ -29,6 +29,7 @@ repository that houses your code.
             'new = bugit.cmd_new:main',
             'list = bugit.cmd_list:main',
             'show = bugit.cmd_show:main',
+            'edit = bugit.cmd_edit:main',
             ],
         },
 

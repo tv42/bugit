@@ -9,6 +9,7 @@ Options:
   -h, --help  show this help message and exit
 
 Common commands include:
+  edit\tEdit a ticket
   init\tInitialize git repository for bugit use
   list\tList tickets matching given criteria
   new\tCreate a new ticket

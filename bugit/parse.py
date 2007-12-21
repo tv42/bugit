@@ -87,6 +87,9 @@ def _parse_header(lines):
         command = match.group('command')
         value = [match.group('value')]
 
+    if command is not None:
+        yield ('_%s' % command, _process(value))
+
 def parse_ticket_raw(lines, strict=False):
     # jump through hoops to peek at the iterator
     try:

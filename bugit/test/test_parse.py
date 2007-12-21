@@ -170,6 +170,30 @@ able to find it in the server logs.
 """)
     assert_raises(StopIteration, g.next)
 
+def test_header_oneline():
+    # edge case of a single header line
+    fp = StringIO("""\
+tags foo
+""")
+    g = parse.parse_ticket(fp)
+    next(g, 'tags/foo', '')
+    assert_raises(StopIteration, g.next)
+
+def test_header_oneline_withdescription():
+    # edge case of a single header line
+    fp = StringIO("""\
+tags foo
+
+bar
+--
+""")
+    g = parse.parse_ticket(fp)
+    next(g, 'tags/foo')
+    next(g, 'description', """\
+bar
+""")
+    assert_raises(StopIteration, g.next)
+
 def test_no_variables():
     fp = StringIO("""\
 tags foo

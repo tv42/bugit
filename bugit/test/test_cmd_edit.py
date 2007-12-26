@@ -32,18 +32,19 @@ def test_simple_stdin_ticketAsArg():
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
             )
-    DESCRIPTION = """\
-Frobbing is borked
-
-I ran frob and it was supposed to blarb, but it qwarked.
-"""
     TICKET = '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'
     result = util.clitest(
         args=[
             'edit',
             TICKET,
             ],
-        stdin=DESCRIPTION,
+        stdin="""\
+nop
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""",
         cwd=tmp,
         )
     eq(
@@ -76,7 +77,11 @@ I ran frob and it was supposed to blarb, but it qwarked.
         path=os.path.join(TICKET, 'description'),
         repo=tmp,
         )
-    eq(got, DESCRIPTION)
+    eq(got, """\
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""")
 
 def test_simple_stdin_ticketInStdin():
     tmp = util.maketemp()
@@ -217,6 +222,8 @@ def test_variables():
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
             ],
         stdin="""\
+nop
+
 Frobbing is borked
 
 I ran frob and it was supposed to blarb, but it qwarked.

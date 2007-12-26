@@ -28,16 +28,17 @@ def test_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    DESCRIPTION = """\
-Frobbing is borked
-
-I ran frob and it was supposed to blarb, but it qwarked.
-"""
     result = util.clitest(
         args=[
             'new',
             ],
-        stdin=DESCRIPTION,
+        stdin="""\
+nop
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""",
         cwd=tmp,
         )
     assert result.stdout != ''
@@ -72,7 +73,11 @@ I ran frob and it was supposed to blarb, but it qwarked.
         path=os.path.join(ticket, 'description'),
         repo=tmp,
         )
-    eq(got, DESCRIPTION)
+    eq(got, """\
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""")
 
 def test_header():
     tmp = util.maketemp()
@@ -180,6 +185,8 @@ def test_variables():
             'new',
             ],
         stdin="""\
+nop
+
 Frobbing is borked
 
 I ran frob and it was supposed to blarb, but it qwarked.

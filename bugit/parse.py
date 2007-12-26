@@ -1,4 +1,3 @@
-import itertools
 import os
 import re
 
@@ -91,17 +90,8 @@ def _parse_header(lines):
         yield ('_%s' % command, _process(value))
 
 def parse_ticket_raw(lines, strict=False):
-    # jump through hoops to peek at the iterator
-    try:
-        line = lines.next()
-    except StopIteration:
-        return
-    lines = itertools.chain([line], lines)
-
-    if strict or _HEADER_RE.match(line):
-        # looks like a header
-        for r in _parse_header(lines):
-            yield r
+    for r in _parse_header(lines):
+        yield r
 
     # slurp the rest in, we need to process it backwards
     lines = list(lines)
@@ -191,6 +181,8 @@ def parse_ticket(fp):
                     yield (os.path.join('tags', tag), '')
             elif variable == '_seen':
                 # TODO
+                pass
+            elif variable == '_nop':
                 pass
             else:
                 raise RuntimeError('Unknown special variable: %r' % variable)

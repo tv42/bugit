@@ -1,6 +1,7 @@
 from __future__ import with_statement
 
-from nose.tools import eq_ as eq, assert_raises
+from nose.tools import eq_ as eq
+from bugit.test.util import assert_raises
 
 from cStringIO import StringIO
 
@@ -15,7 +16,61 @@ def next(g, variable, value=''):
 def test_empty():
     fp = StringIO('')
     g = parse.parse_ticket(fp)
-    assert_raises(StopIteration, g.next)
+    e = assert_raises(
+        parse.InvalidHeaderError,
+        g.next,
+        )
+    eq(
+        str(e),
+        'Invalid header: Header had no complete lines',
+        )
+
+def test_bad_no_header():
+    fp = StringIO("""\
+I am the description.
+""")
+    g = parse.parse_ticket(fp)
+    e = assert_raises(
+        parse.InvalidHeaderError,
+        g.next,
+        )
+    eq(
+        str(e),
+        'Invalid header: Line does not look like a header: %r' \
+            % 'I am the description.',
+        )
+
+def test_bad_no_header_newline():
+    fp = StringIO("""\
+
+I am the description.
+""")
+    g = parse.parse_ticket(fp)
+    e = assert_raises(
+        parse.InvalidHeaderError,
+        g.next,
+        )
+    eq(
+        str(e),
+        'Invalid header: Header had no complete lines',
+        )
+
+def test_bad_continuation():
+    fp = StringIO("""\
+\tfirst line!?!
+
+I am the description.
+""")
+    g = parse.parse_ticket(fp)
+    e = assert_raises(
+        parse.InvalidHeaderError,
+        g.next,
+        )
+    eq(
+        str(e),
+        'Invalid header: Cannot start with a continuation line: %r' \
+            % '\tfirst line!?!',
+        )
 
 def test_simple_raw():
     fp = StringIO("""\

@@ -1,6 +1,12 @@
 import os
 import re
 
+class InvalidHeaderError(Exception):
+    """Invalid header"""
+
+    def __str__(self):
+        return ': '.join([self.__doc__]+list(self.args))
+
 def _strip_prefix(l):
     """
     Go through the lines and strip common leading prefix.
@@ -67,27 +73,43 @@ _HEADER_RE = re.compile(r'^(?P<command>[a-z_][a-z0-9_./@:-]*)(?:\s+(?P<value>.*)
 _VARIABLE_RE = re.compile(r'^(?P<variable>[a-z_][a-z0-9_./@:-]*)(?:=(?P<value>.*))?$')
 
 def _parse_header(lines):
+    seen_header = False
     command = None
     value = []
     for line in lines:
         line = line.rstrip()
         if line.startswith(('\t', ' ')):
-            assert command is not None
+            if command is None:
+                raise InvalidHeaderError(
+                    'Cannot start with a continuation line',
+                    repr(line),
+                    )
             value.append(line)
             continue
         if command is not None:
             yield ('_%s' % command, _process(value))
+            seen_header = True
             command = None
             value = []
         if not line:
             break
         match = _HEADER_RE.match(line)
-        assert match is not None
+        if match is None:
+            raise InvalidHeaderError(
+                "Line does not look like a header",
+                repr(line),
+                )
         command = match.group('command')
         value = [match.group('value')]
 
     if command is not None:
         yield ('_%s' % command, _process(value))
+        seen_header = True
+
+    if not seen_header:
+        raise InvalidHeaderError(
+            "Header had no complete lines",
+            )
 
 def parse_ticket_raw(lines, strict=False):
     for r in _parse_header(lines):

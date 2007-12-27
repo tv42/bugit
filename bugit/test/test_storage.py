@@ -114,3 +114,28 @@ def test_rm_simple():
         )
     got = list(got)
     eq(got, ['xyzzy'])
+
+def test_transaction_ls_simple():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
+            'mockdata\n',
+            )
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/quux',
+            'mock2\n',
+            )
+        t.set(
+            '5d6d80d51c73ea24e47f2de6f207b9de5479b6b2/quux',
+            'distraction\n',
+            )
+    with storage.Transaction(tmp) as t:
+        got = t.ls(
+            path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411',
+            )
+        got = sorted(got)
+        eq(got, sorted(['xyzzy', 'quux']))
+

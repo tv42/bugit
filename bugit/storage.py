@@ -448,7 +448,7 @@ class Transaction(object):
     def ls(self, path):
         return ls(
             repo=self.repo,
-            head=self.head,
+            rev=self.head,
             path=path,
             )
 

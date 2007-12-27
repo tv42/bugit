@@ -30,6 +30,18 @@ def main(args):
     parser = optparse.OptionParser(
         usage='%prog edit [TICKET]',
         )
+    parser.add_option(
+        '--replace',
+        help='replace ticket fully with input',
+        action='store_true',
+        dest='replace',
+        )
+    parser.add_option(
+        '--update',
+        help='update ticket based on input, preserving anything not included',
+        action='store_false',
+        dest='replace',
+        )
     (options, args) = parser.parse_args(args)
 
     ticket = None
@@ -39,9 +51,14 @@ def main(args):
         except ValueError:
             pass
 
+    replace = options.replace
     if sys.stdin.isatty():
+        if replace is None:
+            replace = True
         raise NotImplementedError('TODO plug in an editor')
     else:
+        if replace is None:
+            replace = False
         content = parse.parse_ticket(sys.stdin)
 
     with storage.Transaction('.') as t:
@@ -52,6 +69,11 @@ def main(args):
                 ticket=ticket,
                 )
 
+            if replace:
+                # ugly
+                for path in t.ls(ticket):
+                    t.rm(os.path.join(ticket, path))
+
         for variable, value in content:
             if variable == '_ticket':
                 if ticket is None:
@@ -61,6 +83,10 @@ def main(args):
                         rev=t.head,
                         ticket=ticket,
                         )
+                    if replace:
+                        # ugly
+                        for path in t.ls(ticket):
+                            t.rm(os.path.join(ticket, path))
                 else:
                     print >>sys.stderr, \
                         '%s new: cannot include ticket on both command line and stdin' % (

@@ -20,6 +20,8 @@ Usage: bugit edit [TICKET]
 
 Options:
   -h, --help  show this help message and exit
+  --replace   replace ticket fully with input
+  --update    update ticket based on input, preserving anything not included
 """,
        'stdout does not match:\n%s' % result.stdout)
 
@@ -273,6 +275,184 @@ Frobbing is borked
 
 I ran frob and it was supposed to blarb, but it qwarked.
 """)
+    got = storage.get(
+        path=os.path.join(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            'frob',
+            ),
+        repo=tmp,
+        )
+    eq(got, 'v2.4\n')
+
+def test_replace_explicit():
+    # in --replace mode, all old data is wiped away! this is so that
+    # if you remove a variable line from the serialized version, that
+    # variable really is removed.
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
+            'old',
+            )
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/kilroy',
+            'was here',
+            )
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/tags/got-kilroy',
+            '',
+            )
+    result = util.clitest(
+        args=[
+            'edit',
+            '--replace',
+            ],
+        stdin="""\
+ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+
+
+--
+frob=v2.4
+""",
+        cwd=tmp,
+        )
+    eq(
+        result.stdout,
+        'Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5\n',
+        'Ticket creation stdout is bad:\n%s' % result.stdout,
+        )
+    def list_tickets():
+        # TODO share me
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            repo=tmp,
+            children=True,
+            ):
+            yield basename
+    got = list(list_tickets())
+    eq(got, ['29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'])
+    got = sorted(storage.ls(
+            path='29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            repo=tmp,
+            ))
+    eq(
+        got,
+        sorted([
+                'description',
+                'frob',
+                ]),
+        )
+    got = storage.get(
+        path=os.path.join(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            'description',
+            ),
+        repo=tmp,
+        )
+    eq(got, """\
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""")
+    got = storage.get(
+        path=os.path.join(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            'frob',
+            ),
+        repo=tmp,
+        )
+    eq(got, 'v2.4\n')
+
+def test_update_explicit():
+    # in --update mode, untouched data persists
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
+            'old',
+            )
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/kilroy',
+            'was here\n',
+            )
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/tags/got-kilroy',
+            '',
+            )
+    result = util.clitest(
+        args=[
+            'edit',
+            '--update',
+            ],
+        stdin="""\
+ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+
+
+--
+frob=v2.4
+""",
+        cwd=tmp,
+        )
+    eq(
+        result.stdout,
+        'Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5\n',
+        'Ticket creation stdout is bad:\n%s' % result.stdout,
+        )
+    def list_tickets():
+        # TODO share me
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            repo=tmp,
+            children=True,
+            ):
+            yield basename
+    got = list(list_tickets())
+    eq(got, ['29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'])
+    got = sorted(storage.ls(
+            path='29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            repo=tmp,
+            ))
+    eq(
+        got,
+        sorted([
+                'description',
+                'kilroy',
+                'tags/got-kilroy',
+                'frob',
+                ]),
+        )
+    got = storage.get(
+        path=os.path.join(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            'description',
+            ),
+        repo=tmp,
+        )
+    eq(got, """\
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""")
+    got = storage.get(
+        path=os.path.join(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            'kilroy',
+            ),
+        repo=tmp,
+        )
+    eq(got, 'was here\n')
     got = storage.get(
         path=os.path.join(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',

@@ -93,62 +93,32 @@ def parse_ticket_raw(lines, strict=False):
     for r in _parse_header(lines):
         yield r
 
-    # slurp the rest in, we need to process it backwards
-    lines = list(lines)
+    description_lines = []
 
-    # find the last "--", if any
-    separator = len(lines)-1
-    while separator >= 0:
-        if lines[separator].rstrip() == '--':
+    for line in lines:
+        if line.rstrip() == '--':
             break
-        separator -= 1
-    if separator >= 0:
-        # found separator
-        variables = lines[separator+1:]
-        lines = lines[:separator]
-        # remove initial empty lines
-        while variables and not variables[0].rstrip():
-            del variables[0]
-    else:
-        # no explicit separator found
-        if strict:
-            raise RuntimeError('Description must end with "--"')
-        start = None
-        cur = len(lines)-1
-        while cur >= 0:
-            line = lines[cur]
-            if not line.rstrip() or line.startswith(('\t', ' ')):
-                # looks like continuation
-                pass
-            elif _VARIABLE_RE.match(line):
-                # looks like a good variable
-                start = cur
-            else:
-                # not a valid variable line, stop here
-                break
 
-            cur -= 1
+        description_lines.append(line)
 
-        if start is None:
-            variables = []
-        else:
-            variables = lines[start:]
-            lines = lines[:start]
-
-    while lines and lines[-1] == '\n':
-        del lines[-1]
-    description = ''.join(lines)
+    while description_lines and description_lines[-1] == '\n':
+        del description_lines[-1]
+    description = ''.join(description_lines)
     if description:
         yield ('_description', description)
 
     variable = None
     value = []
-    for line in variables:
+    for line in lines:
         line = line.rstrip()
 
         if not line or line.startswith(('\t', ' ')):
-            assert variable is not None
-            value.append(line)
+            if variable is not None:
+                value.append(line)
+            else:
+                # before the first variable, only empty lines are
+                # allowed
+                assert not line
         else:
             if variable is not None:
                 yield (variable, _process(value))

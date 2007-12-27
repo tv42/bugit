@@ -3,7 +3,7 @@ import os
 
 from bugit import storage
 
-def main(args):
+def main(appinfo, args):
     """Initialize git repository for bugit use"""
     parser = optparse.OptionParser(
         usage='%prog init',

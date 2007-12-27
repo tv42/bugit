@@ -25,7 +25,7 @@ def _ensure_ticket(repo, rev, ticket):
             )
         sys.exit(1)
 
-def main(args):
+def main(appinfo, args):
     """Edit a ticket"""
     parser = optparse.OptionParser(
         usage='%prog edit [TICKET]',

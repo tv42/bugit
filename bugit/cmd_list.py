@@ -6,7 +6,7 @@ from bugit import storage
 from bugit import tagsort
 from bugit import util
 
-def main(args):
+def main(appinfo, args):
     """List tickets matching given criteria"""
     parser = optparse.OptionParser(
         usage='%prog list [OPTS] [--] [SEARCH..]',

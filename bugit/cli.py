@@ -13,6 +13,10 @@ def subcommands():
         fn = entrypoint.load()
         yield (entrypoint.name, fn.__doc__)
 
+class AppInfo(object):
+    """Top-level program state and helper functions."""
+    pass
+
 def main():
     logging.basicConfig()
 
@@ -39,10 +43,12 @@ def main():
         parser.print_help()
         sys.exit(1)
 
+    appinfo = AppInfo()
+
     command = args.pop(0)
     for entrypoint in \
             pkg_resources.iter_entry_points('bugit.command', command):
         fn = entrypoint.load()
-        return fn(args)
+        return fn(appinfo, args)
 
     parser.error('Unknown command: %s' % command)

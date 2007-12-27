@@ -10,7 +10,7 @@ from bugit import storage
 from bugit import parse
 from bugit import tagsort
 
-def main(args):
+def main(appinfo, args):
     """Create a new ticket"""
     parser = optparse.OptionParser(
         usage='%prog new [REV..] [--] [VARIABLE=VALUE..]',

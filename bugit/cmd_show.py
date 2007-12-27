@@ -8,7 +8,7 @@ from bugit import storage
 from bugit import tagsort
 from bugit import util
 
-def main(args):
+def main(appinfo, args):
     """Show details of a ticket"""
     parser = optparse.OptionParser(
         usage='%prog show [OPTS] [TICKET]',

@@ -431,6 +431,8 @@ class Transaction(object):
         return sha
 
     def __exit__(self, type_, value, traceback):
+        # store the tree in any case, for disaster recovery and
+        # debugging
         tree = self._edit_tree(path='', edits=self._edits)
         message = self.message
         commit = git_commit_tree(
@@ -438,12 +440,19 @@ class Transaction(object):
             message=message,
             repo=self.repo,
             )
-        git_update_ref(
-            ref='refs/bugit/HEAD',
-            sha=commit,
-            old_sha=self.head,
-            repo=self.repo,
-            )
+
+        if (type_ is None
+            and value is None
+            and traceback is None):
+            # but only actually use the results if this is a success
+            git_update_ref(
+                ref='refs/bugit/HEAD',
+                sha=commit,
+                old_sha=self.head,
+                repo=self.repo,
+                )
+        else:
+            return False
 
     def ls(self, path):
         return ls(

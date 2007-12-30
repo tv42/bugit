@@ -13,15 +13,29 @@ def test_transaction_abort():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
+            'mockdata\n',
+            )
     class MyException(Exception):
         pass
     try:
         with storage.Transaction(tmp) as t:
+            t.set(
+                'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
+                'newvalue\n',
+                )
             raise MyException()
     except MyException:
         pass
     else:
         raise RuntimeError('Expected MyException')
+    got = storage.get(
+        path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
+        repo=tmp,
+        )
+    eq(got, 'mockdata\n')
 
 def test_transaction_nop():
     tmp = util.maketemp()

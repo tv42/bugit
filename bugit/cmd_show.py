@@ -1,11 +1,12 @@
+from __future__ import with_statement
+
 import optparse
 import os
 import re
 import sys
-import textwrap
 
+from bugit import serialize
 from bugit import storage
-from bugit import tagsort
 from bugit import util
 
 def main(appinfo, args):
@@ -98,73 +99,9 @@ def main(appinfo, args):
             sys.exit(1)
         (ticket,) = tickets
 
-    print 'ticket %s' % ticket
-    number = storage.get(os.path.join(ticket, 'number'))
-    if number is not None:
-        number = number.rstrip()
-        print 'number #%s' % number
-    names = sorted(storage.ls(os.path.join(ticket, 'name')))
-    if names:
-        print textwrap.fill(
-            ' '.join(names),
-            initial_indent='name ',
-            subsequent_indent='     ',
-            break_long_words=False,
+    with storage.Transaction('.') as t:
+        serialize.serialize(
+            transaction=t,
+            ticket=ticket,
+            fp=sys.stdout,
             )
-    tags = set(storage.ls(os.path.join(ticket, 'tags')))
-    if tags:
-        tags = tagsort.human_friendly_tagsort(tags)
-        print textwrap.fill(
-            ' '.join(tags),
-            initial_indent='tags ',
-            subsequent_indent='     ',
-            break_long_words=False,
-            )
-    print 'seen build/301' #TODO
-    print
-    description = storage.get(os.path.join(ticket, 'description')).rstrip()
-    if description:
-        print description
-        print
-    print '--'
-    def get_the_rest():
-        for name in storage.ls(ticket):
-            if name in [
-                'number',
-                'description',
-                ]:
-                continue
-            leading = name.split(os.sep, 1)[0]
-            if leading in [
-                'tags',
-                'name',
-                'seen',
-                'not-seen',
-                ]:
-                continue
-            yield name
-    the_rest = sorted(get_the_rest())
-    if the_rest:
-        for name in the_rest:
-            content = storage.get(os.path.join(ticket, name)).rstrip()
-            if not content:
-                print name
-            elif '\n' not in content:
-                # one line with optional newline; distinguishable from
-                # multiple lines by value starting on the same line,
-                # even if it is wordwrapped for display
-
-                # presence of final newline is not encoded in any way,
-                # on purpose.
-                print '\n'.join(textwrap.wrap(
-                        content,
-                        initial_indent='%s=' % name,
-                        subsequent_indent='\t',
-                        break_long_words=False,
-                        ))
-            else:
-                print '%s=' % name
-                print '\n'.join([
-                        '\t%s' % line
-                        for line in content.split('\n')
-                        ])

@@ -153,3 +153,17 @@ def test_transaction_ls_simple():
         got = sorted(got)
         eq(got, sorted(['xyzzy', 'quux']))
 
+def test_transaction_get_simple():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
+            'mockdata\n',
+            )
+    with storage.Transaction(tmp) as t:
+        got = t.get(
+            path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
+            )
+        eq(got, 'mockdata\n')

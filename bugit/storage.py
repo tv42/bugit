@@ -465,7 +465,7 @@ class Transaction(object):
         return get(
             path=path,
             repo=self.repo,
-            head=self.head,
+            rev=self.head,
             )
 
     def _record(self, path, content):

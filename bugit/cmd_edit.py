@@ -1,5 +1,6 @@
 from __future__ import with_statement
 
+import itertools
 import optparse
 import os
 import random
@@ -61,45 +62,48 @@ def main(appinfo, args):
             replace = False
         content = parse.parse_ticket(sys.stdin)
 
-    with storage.Transaction('.') as t:
+    try:
+        (first_variable, first_value) = content.next()
+    except StopIteration:
+        raise RuntimeError('TODO')
+    if first_variable == '_ticket':
         if ticket is not None:
-            _ensure_ticket(
-                repo='.',
-                rev=t.head,
-                ticket=ticket,
+            print >>sys.stderr, \
+                '%s edit: cannot include ticket on both command line and stdin' % (
+                os.path.basename(sys.argv[0]),
                 )
+            sys.exit(1)
+        ticket = first_value.strip()
+    else:
+        # oops, none of my business.. put it back
+        content = itertools.chain([(first_variable, first_value)], content)
 
-            if replace:
-                # ugly
-                for path in t.ls(ticket):
-                    t.rm(os.path.join(ticket, path))
+    if ticket is None:
+        print >>sys.stderr, \
+            '%s edit: ticket must be given in first header or as argument' % (
+            os.path.basename(sys.argv[0]),
+                )
+        sys.exit(1)
+
+    with storage.Transaction('.') as t:
+        _ensure_ticket(
+            repo='.',
+            rev=t.head,
+            ticket=ticket,
+            )
+        if replace:
+            # ugly
+            for path in t.ls(ticket):
+                t.rm(os.path.join(ticket, path))
 
         for variable, value in content:
             if variable == '_ticket':
-                if ticket is None:
-                    ticket = value.strip()
-                    _ensure_ticket(
-                        repo='.',
-                        rev=t.head,
-                        ticket=ticket,
-                        )
-                    if replace:
-                        # ugly
-                        for path in t.ls(ticket):
-                            t.rm(os.path.join(ticket, path))
-                else:
-                    print >>sys.stderr, \
-                        '%s new: cannot include ticket on both command line and stdin' % (
-                        os.path.basename(sys.argv[0]),
+                print >>sys.stderr, \
+                    '%s edit: ticket header not on first line' % (
+                    os.path.basename(sys.argv[0]),
                     )
-                    sys.exit(1)
+                sys.exit(1)
             else:
-                if ticket is None:
-                    print >>sys.stderr, \
-                        '%s new: need to specify ticket' % (
-                        os.path.basename(sys.argv[0]),
-                        )
-                    sys.exit(1)
                 t.set(
                     os.path.join(ticket, variable),
                     value,

@@ -188,6 +188,8 @@ def test_unknown_ticket_arg():
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
             ],
         stdin="""\
+nop
+
 Frobbing is borked
 """,
         cwd=tmp,
@@ -461,3 +463,126 @@ I ran frob and it was supposed to blarb, but it qwarked.
         repo=tmp,
         )
     eq(got, 'v2.4\n')
+
+def test_ticket_not_first_arg():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
+            'old',
+            )
+    result = util.clitest(
+        args=[
+            'edit',
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            ],
+        stdin="""\
+tags foo
+ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""",
+        cwd=tmp,
+        allow_stderr=True,
+        exit_status=1,
+        )
+    eq(result.stdout, '')
+    eq(
+        result.stderr,
+        'bugit edit: ticket header not on first line\n',
+        'Ticket edit stderr is bad:\n%s' % result.stderr,
+        )
+    def list_tickets():
+        # TODO share me
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            repo=tmp,
+            children=True,
+            ):
+            yield basename
+    got = list(list_tickets())
+    eq(got, ['29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'])
+    got = sorted(storage.ls(
+            path='29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            repo=tmp,
+            ))
+    eq(
+        got,
+        sorted([
+                'description',
+                #TODO 'tags/reporter:TODO'
+                ]),
+        )
+    got = storage.get(
+        path=os.path.join(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            'description',
+            ),
+        repo=tmp,
+        )
+    eq(got, 'old')
+
+def test_ticket_not_first_no_arg():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
+            'old',
+            )
+    result = util.clitest(
+        args=[
+            'edit',
+            ],
+        stdin="""\
+tags foo
+ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""",
+        cwd=tmp,
+        allow_stderr=True,
+        exit_status=1,
+        )
+    eq(result.stdout, '')
+    eq(
+        result.stderr,
+        'bugit edit: ticket must be given in first header or as argument\n',
+        'Ticket edit stderr is bad:\n%s' % result.stderr,
+        )
+    def list_tickets():
+        # TODO share me
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            repo=tmp,
+            children=True,
+            ):
+            yield basename
+    got = list(list_tickets())
+    eq(got, ['29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'])
+    got = sorted(storage.ls(
+            path='29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            repo=tmp,
+            ))
+    eq(
+        got,
+        sorted([
+                'description',
+                #TODO 'tags/reporter:TODO'
+                ]),
+        )
+    got = storage.get(
+        path=os.path.join(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5',
+            'description',
+            ),
+        repo=tmp,
+        )
+    eq(got, 'old')

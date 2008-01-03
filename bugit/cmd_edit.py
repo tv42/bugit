@@ -65,100 +65,116 @@ def main(appinfo, args):
             pass
 
     replace = options.replace
-    if sys.stdin.isatty():
-        print >>sys.stderr, 'bugit edit: editing ticket %s ...' % ticket
-        if replace is None:
-            replace = True
-        filename = os.path.join(
-            '.git',
-            'bugit',
-            'edit.%s.%d.ticket' % (
-                ticket,
-                os.getpid(),
-                ),
-            )
 
-        with file(filename, 'w+') as f:
-            with storage.Transaction('.') as t:
+    with storage.Transaction('.') as transaction:
+
+        if sys.stdin.isatty():
+            if ticket is None:
+                print >>sys.stderr, \
+                    '%s edit: Missing ticket argument for interactive editing' % (
+                    os.path.basename(sys.argv[0]),
+                        )
+                sys.exit(1)
+
+            _ensure_ticket(
+                repo='.',
+                rev=transaction.head,
+                ticket=ticket,
+                )
+
+            print >>sys.stderr, 'bugit edit: editing ticket %s ...' % ticket
+            if replace is None:
+                replace = True
+            filename = os.path.join(
+                '.git',
+                'bugit',
+                'edit.%s.%d.ticket' % (
+                    ticket,
+                    os.getpid(),
+                    ),
+                )
+
+            with file(filename, 'w+') as f:
                 serialize.serialize(
-                    transaction=t,
+                    transaction=transaction,
                     ticket=ticket,
                     fp=f,
                     )
-            f.seek(0)
-            sha_before = _sha_fp(f)
+                f.seek(0)
+                sha_before = _sha_fp(f)
 
-        try:
-            editor.run(
-                appinfo=appinfo,
-                filename=filename,
-                )
-        except subprocess.CalledProcessError, e:
-            print >>sys.stderr, \
-                '%s edit: editor failed with exit status %r' % (
-                os.path.basename(sys.argv[0]),
-                e.returncode,
-                )
-            sys.exit(1)
-        # now read back the file contents
-
-        # non-optimal but who cares right now
-        with file(filename) as f:
-            sha_after = _sha_fp(f)
-            if sha_before == sha_after:
-                print >>sys.stderr, \
-                    '%s edit: file was not changed, discarding' % (
-                    os.path.basename(sys.argv[0]),
+            try:
+                editor.run(
+                    appinfo=appinfo,
+                    filename=filename,
                     )
-                sys.exit(0)
-
-        def parse_file(filename):
-            with file(filename) as f:
-                for x in parse.parse_ticket(f):
-                    yield x
-            os.unlink(filename)
-        content = parse_file(filename)
-
-        # TODO leaves temp file lying around on errors, generators
-        # make fixing that annoying
-
-        # TODO abort if no semantic change? get rid of sha1 check
-    else:
-        if replace is None:
-            replace = False
-        content = parse.parse_ticket(sys.stdin)
-
-    try:
-        (first_variable, first_value) = content.next()
-    except StopIteration:
-        raise RuntimeError('TODO')
-    if first_variable == '_ticket':
-        if ticket is not None:
-            if first_value.strip() != ticket:
+            except subprocess.CalledProcessError, e:
                 print >>sys.stderr, \
-                    '%s edit: tickets on command line and in stdin do not match' % (
+                    '%s edit: editor failed with exit status %r' % (
                     os.path.basename(sys.argv[0]),
+                    e.returncode,
                     )
                 sys.exit(1)
+            # now read back the file contents
+
+            # non-optimal but who cares right now
+            with file(filename) as f:
+                sha_after = _sha_fp(f)
+                if sha_before == sha_after:
+                    print >>sys.stderr, \
+                        '%s edit: file was not changed, discarding' % (
+                        os.path.basename(sys.argv[0]),
+                        )
+                    sys.exit(0)
+
+            def parse_file(filename):
+                with file(filename) as f:
+                    for x in parse.parse_ticket(f):
+                        yield x
+                os.unlink(filename)
+            content = parse_file(filename)
+
+            # TODO leaves temp file lying around on errors, generators
+            # make fixing that annoying
+
+            # TODO abort if no semantic change? get rid of sha1 check
         else:
-            ticket = first_value.strip()
-    else:
-        # oops, none of my business.. put it back
-        content = itertools.chain([(first_variable, first_value)], content)
+            if replace is None:
+                replace = False
+            content = parse.parse_ticket(sys.stdin)
 
-    if ticket is None:
-        print >>sys.stderr, \
-            '%s edit: ticket must be given in first header or as argument' % (
-            os.path.basename(sys.argv[0]),
+        try:
+            (first_variable, first_value) = content.next()
+        except StopIteration:
+            raise RuntimeError('TODO')
+        if first_variable == '_ticket':
+            if ticket is not None:
+                if first_value.strip() != ticket:
+                    print >>sys.stderr, \
+                        '%s edit: tickets on command line and in stdin do not match' % (
+                        os.path.basename(sys.argv[0]),
+                        )
+                    sys.exit(1)
+            else:
+                ticket = first_value.strip()
+        else:
+            # oops, none of my business.. put it back
+            content = itertools.chain([(first_variable, first_value)], content)
+
+        if not sys.stdin.isatty():
+            # batch mode
+            if ticket is None:
+                print >>sys.stderr, \
+                    '%s edit: ticket must be given in first header or as argument' % (
+                    os.path.basename(sys.argv[0]),
+                        )
+                sys.exit(1)
+
+            _ensure_ticket(
+                repo='.',
+                rev=transaction.head,
+                ticket=ticket,
                 )
-        sys.exit(1)
-
-    with storage.Transaction('.') as t:
-        _ensure_ticket(
-            repo='.',
-            rev=t.head,
-            ticket=ticket,
-            )
 
         if replace:
             action = 'replacing'
@@ -168,8 +184,8 @@ def main(appinfo, args):
 
         if replace:
             # ugly
-            for path in t.ls(ticket):
-                t.rm(os.path.join(ticket, path))
+            for path in transaction.ls(ticket):
+                transaction.rm(os.path.join(ticket, path))
 
         for variable, value in content:
             if variable == '_ticket':
@@ -179,7 +195,7 @@ def main(appinfo, args):
                     )
                 sys.exit(1)
             else:
-                t.set(
+                transaction.set(
                     os.path.join(ticket, variable),
                     value,
                     )

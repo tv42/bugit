@@ -915,3 +915,74 @@ bugit edit: saved
         repo=tmp,
         )
     eq(got, 'bar\n')
+
+def test_editor_no_ticket():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
+            'old',
+            )
+    orig_head = storage.git_rev_parse(
+        rev='refs/bugit/HEAD',
+        repo=tmp,
+        )
+    TICKET = '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'
+    class FakeTTYFileDescription(object):
+        def isatty(self):
+            return True
+
+    FAKE_EDITOR = os.path.join(
+        os.path.dirname(__file__),
+        'editor-that-does-nothing',
+        )
+
+    result = util.clitest(
+        args=[
+            'edit',
+            ],
+        environ=dict(
+            BUGIT_EDITOR=FAKE_EDITOR,
+            ),
+        stdin=FakeTTYFileDescription(),
+        exit_status=1,
+        allow_stderr=True,
+        cwd=tmp,
+        )
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: Missing ticket argument for interactive editing
+""")
+    new_head = storage.git_rev_parse(
+        rev='refs/bugit/HEAD',
+        repo=tmp,
+        )
+    eq(orig_head, new_head)
+    def list_tickets():
+        # TODO share me
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            repo=tmp,
+            children=True,
+            ):
+            yield basename
+    got = list(list_tickets())
+    eq(got, [TICKET])
+    got = sorted(storage.ls(
+            path=TICKET,
+            repo=tmp,
+            ))
+    eq(
+        got,
+        sorted([
+                'description',
+                ]),
+        )
+    got = storage.get(
+        path=os.path.join(TICKET, 'description'),
+        repo=tmp,
+        )
+    # without explicit no-edit detection, this gets a newline appended
+    eq(got, 'old')

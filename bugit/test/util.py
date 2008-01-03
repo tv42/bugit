@@ -161,10 +161,10 @@ def clitest(
 
 def check_bugit_repository(repo):
     assert os.path.isdir(os.path.join(repo, '.git', 'bugit'))
-    eq(os.listdir(os.path.join(repo, '.git', 'bugit')), [])
+    eq(os.listdir(os.path.join(repo, '.git', 'bugit')), ['HEAD'])
 
     sha = storage.git_rev_parse(
-        rev='refs/bugit/master',
+        rev='refs/heads/bugit/master',
         repo=repo,
         )
     assert sha is not None
@@ -173,7 +173,7 @@ def check_bugit_repository(repo):
         args=[
             'git',
             'symbolic-ref',
-            'refs/bugit/HEAD',
+            'bugit/HEAD',
             ],
         cwd=repo,
         close_fds=True,
@@ -182,7 +182,7 @@ def check_bugit_repository(repo):
     got = process.stdout.read()
     returncode = process.wait()
     eq(returncode, 0)
-    eq(got, 'refs/bugit/master\n')
+    eq(got, 'refs/heads/bugit/master\n')
 
 def assert_raises(excClass, callableObj, *args, **kwargs):
     """

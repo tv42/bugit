@@ -2,9 +2,9 @@
  Internal data structure
 =========================
 
-- ``.git/refs/bugit/HEAD`` is symref points to ``refs/bugit/master``
+- ``.git/bugit/HEAD`` is symref points to ``refs/heads/bugit/master``
 
-- ``.git/refs/bugit/master`` stores "current state" of bugs
+- ``.git/refs/heads/bugit/master`` stores "current state" of bugs
 
 - caches etc may be stored in ``.git/bugit``
 

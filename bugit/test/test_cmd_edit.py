@@ -780,7 +780,7 @@ def test_editor_noop():
             'old',
             )
     orig_head = storage.git_rev_parse(
-        rev='refs/bugit/HEAD',
+        rev='bugit/HEAD',
         repo=tmp,
         )
     TICKET = '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'
@@ -811,7 +811,7 @@ bugit edit: editing ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5 ...
 bugit edit: file was not changed, discarding
 """)
     new_head = storage.git_rev_parse(
-        rev='refs/bugit/HEAD',
+        rev='bugit/HEAD',
         repo=tmp,
         )
     eq(orig_head, new_head)
@@ -926,7 +926,7 @@ def test_editor_no_ticket():
             'old',
             )
     orig_head = storage.git_rev_parse(
-        rev='refs/bugit/HEAD',
+        rev='bugit/HEAD',
         repo=tmp,
         )
     TICKET = '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'
@@ -956,7 +956,7 @@ def test_editor_no_ticket():
 bugit edit: Missing ticket argument for interactive editing
 """)
     new_head = storage.git_rev_parse(
-        rev='refs/bugit/HEAD',
+        rev='bugit/HEAD',
         repo=tmp,
         )
     eq(orig_head, new_head)

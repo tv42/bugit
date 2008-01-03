@@ -124,9 +124,9 @@ def init(repo):
     """
     util.mkdir(os.path.join(repo, '.git', 'bugit'))
 
-    # does refs/bugit/master exist?
+    # does refs/heads/bugit/master exist?
     if git_rev_parse(
-        rev='refs/bugit/master',
+        rev='refs/heads/bugit/master',
         repo=repo,
         ) is None:
         # it did not, so create it
@@ -146,19 +146,19 @@ def init(repo):
 
         # make a ref point to that tree
         git_update_ref(
-            ref='refs/bugit/master',
+            ref='refs/heads/bugit/master',
             sha=commit,
             old_sha=40*'0',
             repo=repo,
             )
 
-    # does refs/bugit/HEAD exist?
+    # does bugit/HEAD exist?
     process = subprocess.Popen(
         args=[
             'git',
             'symbolic-ref',
             '--quiet',
-            'refs/bugit/HEAD',
+            'bugit/HEAD',
             ],
         cwd=repo,
         close_fds=True,
@@ -175,8 +175,8 @@ def init(repo):
             args=[
                 'git',
                 'symbolic-ref',
-                'refs/bugit/HEAD',
-                'refs/bugit/master',
+                'bugit/HEAD',
+                'refs/heads/bugit/master',
                 ],
             cwd=repo,
             close_fds=True,
@@ -187,7 +187,7 @@ def init(repo):
 def get(path, rev=None, repo=None):
     """Get value of variable, for pure read-only use."""
     if rev is None:
-        rev = 'refs/bugit/HEAD'
+        rev = 'bugit/HEAD'
     if repo is None:
         repo = '.'
     for (mode, type_, object, basename) in git_ls_tree(
@@ -227,7 +227,7 @@ def git_ls_tree(
     if repo is None:
         repo = '.'
     if treeish is None:
-        treeish = 'refs/bugit/HEAD'
+        treeish = 'bugit/HEAD'
     if children is None:
         children = True
     assert not path.startswith('/')
@@ -279,7 +279,7 @@ def git_ls_tree(
 def ls(path, rev=None, repo=None):
     """Generate names of variables, for pure read-only use."""
     if rev is None:
-        rev = 'refs/bugit/HEAD'
+        rev = 'bugit/HEAD'
     if repo is None:
         repo = '.'
     assert not path.endswith('/')
@@ -362,12 +362,12 @@ class Transaction(object):
 
     def __enter__(self):
         head = git_rev_parse(
-            rev='refs/bugit/HEAD',
+            rev='bugit/HEAD',
             repo=self.repo,
             )
         if head is None:
             raise RuntimeError(
-                'Repository is missing refs/bugit/HEAD, '
+                'Repository is missing bugit/HEAD, '
                 +'run bugit init first.')
         self.head = head
         self._edits = {}
@@ -446,7 +446,7 @@ class Transaction(object):
             and traceback is None):
             # but only actually use the results if this is a success
             git_update_ref(
-                ref='refs/bugit/HEAD',
+                ref='bugit/HEAD',
                 sha=commit,
                 old_sha=self.head,
                 repo=self.repo,

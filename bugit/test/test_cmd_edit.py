@@ -47,9 +47,12 @@ Frobbing is borked
 I ran frob and it was supposed to blarb, but it qwarked.
 """,
         cwd=tmp,
+        allow_stderr=True,
         )
-    result.check_stdout("""\
-Edited ticket %s
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: updating ticket %s ...
+bugit edit: saved
 """ % TICKET)
     def list_tickets():
         # TODO share me
@@ -103,9 +106,12 @@ Frobbing is borked
 I ran frob and it was supposed to blarb, but it qwarked.
 """,
         cwd=tmp,
+        allow_stderr=True,
         )
-    result.check_stdout("""\
-Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: updating ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5 ...
+bugit edit: saved
 """)
     def list_tickets():
         # TODO share me
@@ -164,10 +170,13 @@ Frobbing is borked
 I ran frob and it was supposed to blarb, but it qwarked.
 """,
         cwd=tmp,
+        allow_stderr=True,
         )
-    result.check_stdout("""\
-Edited ticket %s
-""" % TICKET)
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: updating ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5 ...
+bugit edit: saved
+""")
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -347,9 +356,12 @@ I ran frob and it was supposed to blarb, but it qwarked.
 frob=v2.4
 """,
         cwd=tmp,
+        allow_stderr=True,
         )
-    result.check_stdout("""\
-Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: updating ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5 ...
+bugit edit: saved
 """)
     def list_tickets():
         # TODO share me
@@ -431,9 +443,12 @@ I ran frob and it was supposed to blarb, but it qwarked.
 frob=v2.4
 """,
         cwd=tmp,
+        allow_stderr=True,
         )
-    result.check_stdout("""\
-Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: replacing ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5 ...
+bugit edit: saved
 """)
     def list_tickets():
         # TODO share me
@@ -512,9 +527,12 @@ I ran frob and it was supposed to blarb, but it qwarked.
 frob=v2.4
 """,
         cwd=tmp,
+        allow_stderr=True,
         )
-    result.check_stdout("""\
-Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: updating ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5 ...
+bugit edit: saved
 """)
     def list_tickets():
         # TODO share me
@@ -596,6 +614,7 @@ I ran frob and it was supposed to blarb, but it qwarked.
         )
     result.check_stdout('')
     result.check_stderr("""\
+bugit edit: updating ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5 ...
 bugit edit: ticket header not on first line
 """)
     def list_tickets():

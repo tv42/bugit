@@ -147,7 +147,11 @@ def clitest(
     result.stdout = stdout.getvalue()
     result.stderr = stderr.getvalue()
     if not allow_stderr:
-        eq(result.stderr, '')
+        eq(
+            result.stderr,
+            '',
+            'unwanted stderr:\n%s' % result.stderr,
+           )
     eq(retcode, exit_status)
     return result
 

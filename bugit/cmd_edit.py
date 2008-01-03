@@ -93,6 +93,13 @@ def main(appinfo, args):
             rev=t.head,
             ticket=ticket,
             )
+
+        if replace:
+            action = 'replacing'
+        else:
+            action = 'updating'
+        print >>sys.stderr, 'bugit edit: %s ticket %s ...' % (action, ticket)
+
         if replace:
             # ugly
             for path in t.ls(ticket):
@@ -112,4 +119,4 @@ def main(appinfo, args):
                     )
 
     assert ticket is not None
-    print 'Edited ticket %s' % ticket
+    print >>sys.stderr, 'bugit edit: saved'

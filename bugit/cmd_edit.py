@@ -4,12 +4,24 @@ import itertools
 import optparse
 import os
 import random
+import sha
+import subprocess
 import sys
 import textwrap
 
 from bugit import storage
 from bugit import parse
-from bugit import tagsort
+from bugit import editor
+from bugit import serialize
+
+def _sha_fp(fp):
+    s = sha.new()
+    while True:
+        data = fp.read(8192)
+        if not data:
+            break
+        s.update(data)
+    return s.hexdigest()
 
 def _ensure_ticket(repo, rev, ticket):
     exists = storage.git_ls_tree(
@@ -54,9 +66,63 @@ def main(appinfo, args):
 
     replace = options.replace
     if sys.stdin.isatty():
+        print >>sys.stderr, 'bugit edit: editing ticket %s ...' % ticket
         if replace is None:
             replace = True
-        raise NotImplementedError('TODO plug in an editor')
+        filename = os.path.join(
+            '.git',
+            'bugit',
+            'edit.%s.%d.ticket' % (
+                ticket,
+                os.getpid(),
+                ),
+            )
+
+        with file(filename, 'w+') as f:
+            with storage.Transaction('.') as t:
+                serialize.serialize(
+                    transaction=t,
+                    ticket=ticket,
+                    fp=f,
+                    )
+            f.seek(0)
+            sha_before = _sha_fp(f)
+
+        try:
+            editor.run(
+                appinfo=appinfo,
+                filename=filename,
+                )
+        except subprocess.CalledProcessError, e:
+            print >>sys.stderr, \
+                '%s edit: editor failed with exit status %r' % (
+                os.path.basename(sys.argv[0]),
+                e.returncode,
+                )
+            sys.exit(1)
+        # now read back the file contents
+
+        # non-optimal but who cares right now
+        with file(filename) as f:
+            sha_after = _sha_fp(f)
+            if sha_before == sha_after:
+                print >>sys.stderr, \
+                    '%s edit: file was not changed, discarding' % (
+                    os.path.basename(sys.argv[0]),
+                    )
+                sys.exit(0)
+
+        def parse_file(filename):
+            with file(filename) as f:
+                for x in parse.parse_ticket(f):
+                    yield x
+            os.unlink(filename)
+        content = parse_file(filename)
+
+        # TODO leaves temp file lying around on errors, generators
+        # make fixing that annoying
+
+        # TODO abort if no semantic change? get rid of sha1 check
     else:
         if replace is None:
             replace = False

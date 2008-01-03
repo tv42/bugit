@@ -94,6 +94,7 @@ def clitest(
     exit_status=None,
     allow_stderr=False,
     cwd=None,
+    environ=None,
     ):
     if stdin is None:
         stdin = ''
@@ -103,7 +104,8 @@ def clitest(
     args = ['bugit']+args
     script = _get_script()
 
-    stdin = StringIO(stdin)
+    if isinstance(stdin, basestring):
+        stdin = StringIO(stdin)
     stdout = StringIO()
     stderr = StringIO()
     (old_stdin, sys.stdin,
@@ -122,7 +124,9 @@ def clitest(
             os.chdir(cwd)
         try:
             try:
-                retcode = script()
+                retcode = script(
+                    environ=environ,
+                    )
             except SystemExit, e:
                 retcode = e.code
             else:

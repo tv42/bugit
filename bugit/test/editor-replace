@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+perl -pi -e 's/foo/bar/g' -- "$@"
+exit 0

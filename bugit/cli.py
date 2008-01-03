@@ -1,5 +1,6 @@
 import logging
 import optparse
+import os
 import sys
 import pkg_resources
 
@@ -15,10 +16,18 @@ def subcommands():
 
 class AppInfo(object):
     """Top-level program state and helper functions."""
-    pass
 
-def main():
+    def __init__(self, **kw):
+        self.environ = kw.pop('environ')
+        super(AppInfo, self).__init__(**kw)
+
+def main(
+    environ=None,
+    ):
     logging.basicConfig()
+
+    if environ is None:
+        environ = os.environ
 
     parser = optparse.OptionParser(
         usage='%prog COMMAND [ARGS]',
@@ -43,7 +52,9 @@ def main():
         parser.print_help()
         sys.exit(1)
 
-    appinfo = AppInfo()
+    appinfo = AppInfo(
+        environ=environ,
+        )
 
     command = args.pop(0)
     for entrypoint in \

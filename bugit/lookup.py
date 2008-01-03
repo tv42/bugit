@@ -52,21 +52,31 @@ def match_all(
                 if has_name is not None:
                     yield ticket
 
+def exists(
+    transaction,
+    ticket,
+    ):
+    found = False
+    for (mode, type_, object, basename) in storage.git_ls_tree(
+        path=ticket,
+        treeish=transaction.head,
+        repo=transaction.repo,
+        children=False,
+        ):
+        found = True
+        break
+    return found
+
 def match(
     transaction,
     requested_ticket,
     ):
     if re.match('^[0-9a-f]{40}$', requested_ticket):
         # full sha, no need to look up, just check it's there
-        found = False
-        for (mode, type_, object, basename) in storage.git_ls_tree(
-            path=requested_ticket,
-            treeish=transaction.head,
-            repo=transaction.repo,
-            children=False,
+        if not exists(
+            transaction=transaction,
+            ticket=requested_ticket,
             ):
-            found = True
-        if not found:
             raise TicketNotFoundError(requested_ticket)
         ticket = requested_ticket
     else:

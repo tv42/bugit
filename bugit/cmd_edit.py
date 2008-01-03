@@ -13,6 +13,7 @@ from bugit import storage
 from bugit import parse
 from bugit import editor
 from bugit import serialize
+from bugit import lookup
 
 def _sha_fp(fp):
     s = sha.new()
@@ -22,21 +23,6 @@ def _sha_fp(fp):
             break
         s.update(data)
     return s.hexdigest()
-
-def _ensure_ticket(repo, rev, ticket):
-    exists = storage.git_ls_tree(
-        path=ticket,
-        repo=repo,
-        treeish=rev,
-        )
-    try:
-        exists.next()
-    except StopIteration:
-        print >>sys.stderr, '%s edit: ticket not found: %s' % (
-            os.path.basename(sys.argv[0]),
-            ticket,
-            )
-        sys.exit(1)
 
 def main(appinfo, args):
     """Edit a ticket"""
@@ -68,6 +54,19 @@ def main(appinfo, args):
 
     with storage.Transaction('.') as transaction:
 
+        if ticket is not None:
+            try:
+                ticket = lookup.match(
+                    transaction=transaction,
+                    requested_ticket=ticket,
+                    )
+            except lookup.TicketLookupError, e:
+                print >>sys.stderr, '%s edit: %s' % (
+                    os.path.basename(sys.argv[0]),
+                    e,
+                    )
+                sys.exit(1)
+
         if sys.stdin.isatty():
             if ticket is None:
                 print >>sys.stderr, \
@@ -75,12 +74,6 @@ def main(appinfo, args):
                     os.path.basename(sys.argv[0]),
                         )
                 sys.exit(1)
-
-            _ensure_ticket(
-                repo='.',
-                rev=transaction.head,
-                ticket=ticket,
-                )
 
             print >>sys.stderr, 'bugit edit: editing ticket %s ...' % ticket
             if replace is None:
@@ -170,11 +163,15 @@ def main(appinfo, args):
                         )
                 sys.exit(1)
 
-            _ensure_ticket(
-                repo='.',
-                rev=transaction.head,
+            if not lookup.exists(
+                transaction=transaction,
                 ticket=ticket,
-                )
+                ):
+                print >>sys.stderr, '%s edit: ticket not found: %s' % (
+                    os.path.basename(sys.argv[0]),
+                    ticket,
+                    )
+                sys.exit(1)
 
         if replace:
             action = 'replacing'

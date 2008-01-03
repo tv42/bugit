@@ -317,7 +317,7 @@ Frobbing is borked
         )
     result.check_stdout('')
     result.check_stderr("""\
-bugit edit: ticket not found: 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+bugit edit: Ticket not found: 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
 """)
     def list_tickets():
         # TODO share me
@@ -986,3 +986,64 @@ bugit edit: Missing ticket argument for interactive editing
         )
     # without explicit no-edit detection, this gets a newline appended
     eq(got, 'old')
+
+def test_lookup_abbreviated():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
+            'old',
+            )
+    TICKET = '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'
+    result = util.clitest(
+        args=[
+            'edit',
+            '29d7',
+            ],
+        stdin="""\
+nop
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""",
+        cwd=tmp,
+        allow_stderr=True,
+        )
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: updating ticket %s ...
+bugit edit: saved
+""" % TICKET)
+    def list_tickets():
+        # TODO share me
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            repo=tmp,
+            children=True,
+            ):
+            yield basename
+    got = list(list_tickets())
+    eq(got, [TICKET])
+    got = sorted(storage.ls(
+            path=TICKET,
+            repo=tmp,
+            ))
+    eq(
+        got,
+        sorted([
+                'description',
+                #TODO 'tags/reporter:TODO'
+                ]),
+        )
+    got = storage.get(
+        path=os.path.join(TICKET, 'description'),
+        repo=tmp,
+        )
+    eq(got, """\
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""")

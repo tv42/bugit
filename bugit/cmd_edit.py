@@ -68,12 +68,14 @@ def main(appinfo, args):
         raise RuntimeError('TODO')
     if first_variable == '_ticket':
         if ticket is not None:
-            print >>sys.stderr, \
-                '%s edit: cannot include ticket on both command line and stdin' % (
-                os.path.basename(sys.argv[0]),
-                )
-            sys.exit(1)
-        ticket = first_value.strip()
+            if first_value.strip() != ticket:
+                print >>sys.stderr, \
+                    '%s edit: tickets on command line and in stdin do not match' % (
+                    os.path.basename(sys.argv[0]),
+                    )
+                sys.exit(1)
+        else:
+            ticket = first_value.strip()
     else:
         # oops, none of my business.. put it back
         content = itertools.chain([(first_variable, first_value)], content)

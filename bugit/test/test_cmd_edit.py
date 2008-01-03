@@ -146,6 +146,125 @@ Frobbing is borked
 I ran frob and it was supposed to blarb, but it qwarked.
 """)
 
+def test_simple_stdin_ticketAsBoth_ok():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
+            'old',
+            )
+    TICKET = '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'
+    result = util.clitest(
+        args=[
+            'edit',
+            TICKET,
+            ],
+        stdin="""\
+ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""",
+        cwd=tmp,
+        )
+    eq(
+        result.stdout,
+        'Edited ticket %s\n' % TICKET,
+        'Ticket creation stdout is bad:\n%s' % result.stdout,
+        )
+    def list_tickets():
+        # TODO share me
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            repo=tmp,
+            children=True,
+            ):
+            yield basename
+    got = list(list_tickets())
+    eq(got, [TICKET])
+    got = sorted(storage.ls(
+            path=TICKET,
+            repo=tmp,
+            ))
+    eq(
+        got,
+        sorted([
+                'description',
+                #TODO 'tags/reporter:TODO'
+                ]),
+        )
+    got = storage.get(
+        path=os.path.join(TICKET, 'description'),
+        repo=tmp,
+        )
+    eq(got, """\
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""")
+
+def test_simple_stdin_ticketAsBoth_no_match():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
+            'old',
+            )
+    TICKET = '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5'
+    result = util.clitest(
+        args=[
+            'edit',
+            TICKET,
+            ],
+        stdin="""\
+ticket aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
+Frobbing is borked
+
+I ran frob and it was supposed to blarb, but it qwarked.
+""",
+        cwd=tmp,
+        exit_status=1,
+        allow_stderr=True,
+        )
+    eq(result.stdout, '')
+    eq(
+        result.stderr,
+        'bugit edit: tickets on command line and in stdin do not match\n',
+        'Ticket edit stderr is bad:\n%s' % result.stderr,
+        )
+    def list_tickets():
+        # TODO share me
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            repo=tmp,
+            children=True,
+            ):
+            yield basename
+    got = list(list_tickets())
+    eq(got, [TICKET])
+    got = sorted(storage.ls(
+            path=TICKET,
+            repo=tmp,
+            ))
+    eq(
+        got,
+        sorted([
+                'description',
+                #TODO 'tags/reporter:TODO'
+                ]),
+        )
+    got = storage.get(
+        path=os.path.join(TICKET, 'description'),
+        repo=tmp,
+        )
+    eq(got, 'old')
+
 def test_unknown_ticket_stdin():
     tmp = util.maketemp()
     storage.git_init(tmp)

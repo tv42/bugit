@@ -81,7 +81,7 @@ def test_not_found_sha():
         )
     result.check_stdout('')
     result.check_stderr("""\
-bugit: ticket not found: 1111111111111111111111111111111111111111
+bugit: Ticket not found: 1111111111111111111111111111111111111111
 """)
 
 def test_not_found_number():
@@ -99,7 +99,7 @@ def test_not_found_number():
         )
     result.check_stdout('')
     result.check_stderr("""\
-bugit: ticket not found: #11
+bugit: Ticket not found: #11
 """)
 
 def test_ambiguous():
@@ -130,7 +130,7 @@ Bar
         )
     result.check_stdout('')
     result.check_stderr("""\
-bugit: matches more than one ticket: d239
+bugit: Matches more than one ticket: d239
 """)
 
 def test_not_found_name():
@@ -148,7 +148,7 @@ def test_not_found_name():
         )
     result.check_stdout('')
     result.check_stderr("""\
-bugit: ticket not found: foo
+bugit: Ticket not found: foo
 """)
 
 def test_simple():

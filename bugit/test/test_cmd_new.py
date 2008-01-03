@@ -16,13 +16,12 @@ def test_help():
             '--help',
             ],
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 Usage: bugit new [REV..] [--] [VARIABLE=VALUE..]
 
 Options:
   -h, --help  show this help message and exit
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_simple():
     tmp = util.maketemp()
@@ -161,8 +160,8 @@ I ran frob and it was supposed to blarb, but it qwarked.
         allow_stderr=True,
         exit_status=1,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 bugit new: cannot include ticket identity when creating ticket
 """)
     def list_tickets():

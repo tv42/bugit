@@ -67,7 +67,19 @@ def maketemp():
     return tmp
 
 class CLITestResult(object):
-    pass
+    def check_stdout(self, want):
+        eq(
+            self.stdout,
+            want,
+            'stdout does not match:\n%s' % self.stdout,
+            )
+
+    def check_stderr(self, want):
+        eq(
+            self.stderr,
+            want,
+            'stderr does not match:\n%s' % self.stderr,
+            )
 
 def _get_script():
     my_distr = list(

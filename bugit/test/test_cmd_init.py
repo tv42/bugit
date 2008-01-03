@@ -13,13 +13,12 @@ def test_help():
             '--help',
             ],
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 Usage: bugit init
 
 Options:
   -h, --help  show this help message and exit
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_simple():
     tmp = util.maketemp()
@@ -30,7 +29,7 @@ def test_simple():
             ],
         cwd=tmp,
         )
-    eq(result.stdout, '')
+    result.check_stdout('')
     util.check_bugit_repository(repo=tmp)
 
 def test_repeat():
@@ -42,7 +41,7 @@ def test_repeat():
             ],
         cwd=tmp,
         )
-    eq(result.stdout, '')
+    result.check_stdout('')
     util.check_bugit_repository(repo=tmp)
     result = util.clitest(
         args=[
@@ -50,7 +49,7 @@ def test_repeat():
             ],
         cwd=tmp,
         )
-    eq(result.stdout, '')
+    result.check_stdout('')
     util.check_bugit_repository(repo=tmp)
 
 
@@ -63,8 +62,8 @@ def test_bad_too_many_args():
         exit_status=2,
         allow_stderr=True,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 Usage: bugit init
 
 bugit: error: too many arguments

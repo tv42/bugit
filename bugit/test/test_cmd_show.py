@@ -17,7 +17,7 @@ def test_help():
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 Usage: bugit show [OPTS] [TICKET]
 
 Options:
@@ -38,8 +38,8 @@ def test_bad_no_default_ticket():
         exit_status=2,
         allow_stderr=True,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 Usage: bugit show [OPTS] [TICKET]
 
 bugit: error: no default ticket set
@@ -59,8 +59,8 @@ def test_bad_too_many_args():
         exit_status=2,
         allow_stderr=True,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 Usage: bugit show [OPTS] [TICKET]
 
 bugit: error: too many arguments
@@ -79,8 +79,8 @@ def test_not_found_sha():
         exit_status=1,
         allow_stderr=True,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 bugit: ticket not found: 1111111111111111111111111111111111111111
 """)
 
@@ -97,8 +97,8 @@ def test_not_found_number():
         exit_status=1,
         allow_stderr=True,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 bugit: ticket not found: #11
 """)
 
@@ -128,8 +128,8 @@ Bar
         exit_status=1,
         allow_stderr=True,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 bugit: matches more than one ticket: d239
 """)
 
@@ -146,8 +146,8 @@ def test_not_found_name():
         exit_status=1,
         allow_stderr=True,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 bugit: ticket not found: foo
 """)
 
@@ -201,7 +201,7 @@ able to find it in the server logs.
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 number #3431
 tags priority:high denial-of-service security
@@ -221,8 +221,7 @@ able to find it in the server logs.
 --
 browser=Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6)
 \tGecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_minimal():
     tmp = util.maketemp()
@@ -242,15 +241,14 @@ Oncolator segfaults on some inputs
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
 Oncolator segfaults on some inputs
 
 --
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_minimal_with_number():
     tmp = util.maketemp()
@@ -274,7 +272,7 @@ Oncolator segfaults on some inputs
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 number #3431
 seen build/301
@@ -282,8 +280,7 @@ seen build/301
 Oncolator segfaults on some inputs
 
 --
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_lookup_sha():
     tmp = util.maketemp()
@@ -303,15 +300,14 @@ Oncolator segfaults on some inputs
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
 Oncolator segfaults on some inputs
 
 --
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_lookup_sha_abbreviated_4():
     tmp = util.maketemp()
@@ -331,15 +327,14 @@ Oncolator segfaults on some inputs
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
 Oncolator segfaults on some inputs
 
 --
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_lookup_name():
     tmp = util.maketemp()
@@ -363,7 +358,7 @@ Oncolator segfaults on some inputs
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 name oncolator-segfault
 seen build/301
@@ -371,8 +366,7 @@ seen build/301
 Oncolator segfaults on some inputs
 
 --
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_variable_short():
     tmp = util.maketemp()
@@ -396,7 +390,7 @@ Oncolator segfaults on some inputs
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
@@ -404,8 +398,7 @@ Oncolator segfaults on some inputs
 
 --
 answer=42
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_variable_long():
     tmp = util.maketemp()
@@ -439,7 +432,7 @@ Oncolator segfaults on some inputs
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
@@ -452,8 +445,7 @@ toolong=foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
 \tfoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
 \tfoo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo foo
 \tfoo
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_variable_multiline():
     tmp = util.maketemp()
@@ -483,7 +475,7 @@ dear to author
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 seen build/301
 
@@ -496,5 +488,4 @@ multiline=
 \tand my formatting
 \tis precious and
 \tdear to author
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")

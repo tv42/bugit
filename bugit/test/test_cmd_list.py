@@ -13,7 +13,7 @@ def test_help():
             '--help',
             ],
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 Usage: bugit list [OPTS] [--] [SEARCH..]
 
 Options:
@@ -35,7 +35,7 @@ def test_empty():
             ],
         cwd=tmp,
         )
-    eq(result.stdout, '')
+    result.check_stdout('')
 
 def test_no_match():
     tmp = util.maketemp()
@@ -61,7 +61,7 @@ def test_no_match():
             ],
         cwd=tmp,
         )
-    eq(result.stdout, '')
+    result.check_stdout('')
 
 def test_simple():
     tmp = util.maketemp()
@@ -104,7 +104,7 @@ able to find it in the server logs.
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 #3431\tOncolator segfaults on some inputs
   priority:high denial-of-service security
 """)
@@ -158,7 +158,7 @@ able to find it in the server logs.
             ],
         cwd=tmp,
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 #3431\tOncolator segfaults on some inputs
   priority:high blah-blah-blah denial-of-service lots-of-long-tickets
   security
@@ -203,7 +203,7 @@ able to find it in the server logs.
         )
     # with no number or name, default to 7-digit prefix of ticket,
     # similar to git rev-parse --short
-    eq(result.stdout, """\
+    result.check_stdout("""\
 f3da69c\tOncolator segfaults on some inputs
   priority:high denial-of-service security
 """)

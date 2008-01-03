@@ -21,11 +21,7 @@ def test_no_args():
         args=[],
         exit_status=1,
         )
-    eq(
-        result.stdout,
-        USAGE,
-        'stdout does not match:\n%s' % result.stdout,
-        )
+    result.check_stdout(USAGE)
 
 def test_global_help():
     result = util.clitest(
@@ -33,11 +29,7 @@ def test_global_help():
             '--help',
             ],
         )
-    eq(
-        result.stdout,
-        USAGE,
-        'stdout does not match:\n%s' % result.stdout,
-       )
+    result.check_stdout(USAGE)
 
 def test_bad_command():
     result = util.clitest(
@@ -47,8 +39,8 @@ def test_bad_command():
         allow_stderr=True,
         exit_status=2,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 Usage: bugit COMMAND [ARGS]
 
 bugit: error: Unknown command: xyzzy

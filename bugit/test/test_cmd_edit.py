@@ -15,15 +15,14 @@ def test_help():
             '--help',
             ],
         )
-    eq(result.stdout, """\
+    result.check_stdout("""\
 Usage: bugit edit [TICKET]
 
 Options:
   -h, --help  show this help message and exit
   --replace   replace ticket fully with input
   --update    update ticket based on input, preserving anything not included
-""",
-       'stdout does not match:\n%s' % result.stdout)
+""")
 
 def test_simple_stdin_ticketAsArg():
     tmp = util.maketemp()
@@ -49,11 +48,9 @@ I ran frob and it was supposed to blarb, but it qwarked.
 """,
         cwd=tmp,
         )
-    eq(
-        result.stdout,
-        'Edited ticket %s\n' % TICKET,
-        'Ticket creation stdout is bad:\n%s' % result.stdout,
-        )
+    result.check_stdout("""\
+Edited ticket %s
+""" % TICKET)
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -107,11 +104,9 @@ I ran frob and it was supposed to blarb, but it qwarked.
 """,
         cwd=tmp,
         )
-    eq(
-        result.stdout,
-        'Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5\n',
-        'Ticket creation stdout is bad:\n%s' % result.stdout,
-        )
+    result.check_stdout("""\
+Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+""")
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -170,11 +165,9 @@ I ran frob and it was supposed to blarb, but it qwarked.
 """,
         cwd=tmp,
         )
-    eq(
-        result.stdout,
-        'Edited ticket %s\n' % TICKET,
-        'Ticket creation stdout is bad:\n%s' % result.stdout,
-        )
+    result.check_stdout("""\
+Edited ticket %s
+""" % TICKET)
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -232,12 +225,10 @@ I ran frob and it was supposed to blarb, but it qwarked.
         exit_status=1,
         allow_stderr=True,
         )
-    eq(result.stdout, '')
-    eq(
-        result.stderr,
-        'bugit edit: tickets on command line and in stdin do not match\n',
-        'Ticket edit stderr is bad:\n%s' % result.stderr,
-        )
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: tickets on command line and in stdin do not match
+""")
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -282,8 +273,8 @@ Frobbing is borked
         allow_stderr=True,
         exit_status=1,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 bugit edit: ticket not found: 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
 """)
     def list_tickets():
@@ -315,8 +306,8 @@ Frobbing is borked
         allow_stderr=True,
         exit_status=1,
         )
-    eq(result.stdout, '')
-    eq(result.stderr, """\
+    result.check_stdout('')
+    result.check_stderr("""\
 bugit edit: ticket not found: 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
 """)
     def list_tickets():
@@ -357,11 +348,9 @@ frob=v2.4
 """,
         cwd=tmp,
         )
-    eq(
-        result.stdout,
-        'Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5\n',
-        'Ticket creation stdout is bad:\n%s' % result.stdout,
-        )
+    result.check_stdout("""\
+Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+""")
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -443,11 +432,9 @@ frob=v2.4
 """,
         cwd=tmp,
         )
-    eq(
-        result.stdout,
-        'Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5\n',
-        'Ticket creation stdout is bad:\n%s' % result.stdout,
-        )
+    result.check_stdout("""\
+Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+""")
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -526,11 +513,9 @@ frob=v2.4
 """,
         cwd=tmp,
         )
-    eq(
-        result.stdout,
-        'Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5\n',
-        'Ticket creation stdout is bad:\n%s' % result.stdout,
-        )
+    result.check_stdout("""\
+Edited ticket 29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5
+""")
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -609,12 +594,10 @@ I ran frob and it was supposed to blarb, but it qwarked.
         allow_stderr=True,
         exit_status=1,
         )
-    eq(result.stdout, '')
-    eq(
-        result.stderr,
-        'bugit edit: ticket header not on first line\n',
-        'Ticket edit stderr is bad:\n%s' % result.stderr,
-        )
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: ticket header not on first line
+""")
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -670,12 +653,10 @@ I ran frob and it was supposed to blarb, but it qwarked.
         allow_stderr=True,
         exit_status=1,
         )
-    eq(result.stdout, '')
-    eq(
-        result.stderr,
-        'bugit edit: ticket must be given in first header or as argument\n',
-        'Ticket edit stderr is bad:\n%s' % result.stderr,
-        )
+    result.check_stdout('')
+    result.check_stderr("""\
+bugit edit: ticket must be given in first header or as argument
+""")
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(

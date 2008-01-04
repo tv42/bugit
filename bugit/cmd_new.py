@@ -101,7 +101,12 @@ Separate variables from main description with "--".
     else:
         content = parse.parse_ticket(sys.stdin)
 
-    with storage.Transaction('.') as t:
+    with storage.Transaction(
+        repo='.',
+        message="""\
+Created ticket %s
+""" % ticket,
+        ) as t:
         for variable, value in content:
             if variable == '_ticket':
                 if value.strip() != ticket:

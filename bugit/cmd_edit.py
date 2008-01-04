@@ -197,5 +197,9 @@ def main(appinfo, args):
                     value,
                     )
 
+        transaction.message = """\
+Edited ticket %s
+""" % ticket
+
     assert ticket is not None
     print >>sys.stderr, 'bugit edit: saved'

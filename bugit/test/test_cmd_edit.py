@@ -3,6 +3,8 @@ from __future__ import with_statement
 from nose.tools import eq_ as eq
 
 import os
+import re
+import subprocess
 
 from bugit import storage
 
@@ -94,6 +96,10 @@ def test_simple_stdin_ticketInStdin():
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
             )
+    orig_head = storage.git_rev_parse(
+        rev='bugit/HEAD',
+        repo=tmp,
+        )
     result = util.clitest(
         args=[
             'edit',
@@ -146,6 +152,38 @@ Frobbing is borked
 
 I ran frob and it was supposed to blarb, but it qwarked.
 """)
+
+    process = subprocess.Popen(
+        args=[
+            'git',
+            'cat-file',
+            'commit',
+            'bugit/HEAD',
+            ],
+        cwd=tmp,
+        close_fds=True,
+        stdout=subprocess.PIPE,
+        )
+    got = process.stdout.read()
+    returncode = process.wait()
+    eq(returncode, 0)
+    m = re.match(
+        r"""
+^
+tree\ [0-9a-f]{40}\n
+parent\ (?P<parent>[0-9a-f]{40})\n
+author\ [^\n]+\n
+committer\ [^\n]+\n
+\n
+Edited\ ticket\ (?P<ticket>[0-9a-f]{40})\n
+$
+""",
+        got,
+        re.VERBOSE,
+        )
+    assert m is not None, 'stdout does not match:\n%s' % got
+    eq(m.group('parent'), orig_head)
+    eq(m.group('ticket'), '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5')
 
 def test_simple_stdin_ticketAsBoth_ok():
     tmp = util.maketemp()

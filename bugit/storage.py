@@ -439,10 +439,9 @@ class Transaction(object):
         # store the tree in any case, for disaster recovery and
         # debugging
         tree = self._edit_tree(path='', edits=self._edits)
-        message = self.message
         commit = git_commit_tree(
             tree=tree,
-            message=message,
+            message=self.message,
             repo=self.repo,
             parents=[self.head],
             )

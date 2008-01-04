@@ -386,3 +386,24 @@ $
             yield basename
     got = list(list_tickets())
     eq(got, [ticket])
+    got = sorted(storage.ls(
+            path=ticket,
+            repo=tmp,
+            ))
+    eq(
+        got,
+        sorted([
+                'description',
+                #TODO 'tags/reporter:TODO'
+                ]),
+        )
+    got = storage.get(
+        path=os.path.join(ticket, 'description'),
+        repo=tmp,
+        )
+    eq(got, """\
+Enter description here, with a short first paragraph.
+
+Separate variables from main description with "--".
+Kilroy was here
+""")

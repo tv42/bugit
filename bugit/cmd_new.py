@@ -118,10 +118,11 @@ Separate variables from main description with "--".
                             os.path.basename(sys.argv[0]),
                             )
                     sys.exit(1)
-            t.set(
-                os.path.join(ticket, variable),
-                value,
-                )
+            else:
+                t.set(
+                    os.path.join(ticket, variable),
+                    value,
+                    )
     print >>sys.stderr, \
         '%s new: saved' % (
         os.path.basename(sys.argv[0]),

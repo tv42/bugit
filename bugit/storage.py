@@ -71,15 +71,20 @@ def git_commit_tree(
     tree,
     message=None,
     repo=None,
+    parents=None,
     ):
     if repo is None:
         repo = '.'
+    args = [
+        'git',
+        'commit-tree',
+        tree,
+        ]
+    if parents is not None:
+        for parent in parents:
+            args.extend(['-p', parent])
     process = subprocess.Popen(
-        args=[
-            'git',
-            'commit-tree',
-            tree,
-            ],
+        args=args,
         cwd=repo,
         close_fds=True,
         stdin=subprocess.PIPE,
@@ -439,6 +444,7 @@ class Transaction(object):
             tree=tree,
             message=message,
             repo=self.repo,
+            parents=[self.head],
             )
 
         if (type_ is None

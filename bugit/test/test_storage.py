@@ -62,6 +62,10 @@ def test_transaction_set_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
+    orig_head = storage.git_rev_parse(
+        rev='bugit/HEAD',
+        repo=tmp,
+        )
     with storage.Transaction(tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
@@ -72,6 +76,16 @@ def test_transaction_set_simple():
         repo=tmp,
         )
     eq(got, 'mockdata\n')
+    parent = storage.git_rev_parse(
+        rev='bugit/HEAD^1',
+        repo=tmp,
+        )
+    eq(orig_head, parent)
+    merge = storage.git_rev_parse(
+        rev='bugit/HEAD^2',
+        repo=tmp,
+        )
+    eq(merge, None)
 
 def test_ls_simple():
     tmp = util.maketemp()

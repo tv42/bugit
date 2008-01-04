@@ -39,14 +39,22 @@ Frobbing is borked
 I ran frob and it was supposed to blarb, but it qwarked.
 """,
         cwd=tmp,
+        allow_stderr=True,
         )
-    assert result.stdout != ''
-    assert result.stdout.endswith('\n')
-    assert '\n' not in result.stdout[:-1]
-    m = re.match('^Saved ticket ([0-9a-f]{40})$', result.stdout)
+    result.check_stdout('')
+    stderr = result.stderr.splitlines(True)
+    assert len(stderr) >= 1
+    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
     assert m is not None, \
-        'Ticket creation stdout is bad:\n%s' % result.stdout
+        'Ticket creation stderr is bad:\n%s' % result.stderr
     ticket = m.group(1)
+    eq(
+        stderr[1:],
+        [
+            "bugit new: saved\n",
+            ],
+        )
+
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -94,14 +102,21 @@ Frobbing is borked
 I ran frob and it was supposed to blarb, but it qwarked.
 """,
         cwd=tmp,
+        allow_stderr=True,
         )
-    assert result.stdout != ''
-    assert result.stdout.endswith('\n')
-    assert '\n' not in result.stdout[:-1]
-    m = re.match('^Saved ticket ([0-9a-f]{40})$', result.stdout)
+    result.check_stdout('')
+    stderr = result.stderr.splitlines(True)
+    assert len(stderr) >= 1
+    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
     assert m is not None, \
-        'Ticket creation stdout is bad:\n%s' % result.stdout
+        'Ticket creation stderr is bad:\n%s' % result.stderr
     ticket = m.group(1)
+    eq(
+        stderr[1:],
+        [
+            "bugit new: saved\n",
+            ],
+        )
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -161,9 +176,18 @@ I ran frob and it was supposed to blarb, but it qwarked.
         exit_status=1,
         )
     result.check_stdout('')
-    result.check_stderr("""\
-bugit new: cannot include ticket identity when creating ticket
-""")
+    stderr = result.stderr.splitlines(True)
+    assert len(stderr) >= 1
+    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
+    assert m is not None, \
+        'Ticket creation stderr is bad:\n%s' % result.stderr
+    ticket = m.group(1)
+    eq(
+        stderr[1:],
+        [
+            "bugit new: cannot include ticket identity when creating ticket\n",
+            ],
+        )
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -195,14 +219,22 @@ I ran frob and it was supposed to blarb, but it qwarked.
 frob=v2.4
 """,
         cwd=tmp,
+        allow_stderr=True,
         )
-    assert result.stdout != ''
-    assert result.stdout.endswith('\n')
-    assert '\n' not in result.stdout[:-1]
-    m = re.match('^Saved ticket ([0-9a-f]{40})$', result.stdout)
+    result.check_stdout('')
+    stderr = result.stderr.splitlines(True)
+    assert len(stderr) >= 1
+    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
     assert m is not None, \
-        'Ticket creation stdout is bad:\n%s' % result.stdout
+        'Ticket creation stderr is bad:\n%s' % result.stderr
     ticket = m.group(1)
+    eq(
+        stderr[1:],
+        [
+            "bugit new: saved\n",
+            ],
+        )
+
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -239,3 +271,145 @@ I ran frob and it was supposed to blarb, but it qwarked.
         repo=tmp,
         )
     eq(got, 'v2.4\n')
+
+def test_editor_fail():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    orig_head = storage.git_rev_parse(
+        rev='bugit/HEAD',
+        repo=tmp,
+        )
+    class FakeTTYFileDescription(object):
+        def isatty(self):
+            return True
+
+    FAKE_EDITOR = os.path.join(
+        os.path.dirname(__file__),
+        'editor-that-fails',
+        )
+
+    result = util.clitest(
+        args=[
+            'new',
+            ],
+        environ=dict(
+            BUGIT_EDITOR=FAKE_EDITOR,
+            ),
+        stdin=FakeTTYFileDescription(),
+        cwd=tmp,
+        allow_stderr=True,
+        exit_status=1,
+        )
+    result.check_stdout('')
+    stderr = result.stderr.splitlines(True)
+    assert len(stderr) >= 1
+    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
+    assert m is not None, \
+        'Ticket creation stderr is bad:\n%s' % result.stderr
+    eq(
+        stderr[1:],
+        [
+            "bugit new: editor failed with exit status 42\n",
+            #TODO "bugit new: file was not changed, discarding\n",
+            ],
+        )
+    new_head = storage.git_rev_parse(
+        rev='bugit/HEAD',
+        repo=tmp,
+        )
+    eq(orig_head, new_head)
+
+def test_editor_noop():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    orig_head = storage.git_rev_parse(
+        rev='bugit/HEAD',
+        repo=tmp,
+        )
+    class FakeTTYFileDescription(object):
+        def isatty(self):
+            return True
+
+    FAKE_EDITOR = os.path.join(
+        os.path.dirname(__file__),
+        'editor-that-does-nothing',
+        )
+
+    result = util.clitest(
+        args=[
+            'new',
+            ],
+        environ=dict(
+            BUGIT_EDITOR=FAKE_EDITOR,
+            ),
+        stdin=FakeTTYFileDescription(),
+        allow_stderr=True,
+        cwd=tmp,
+        )
+    result.check_stdout('')
+    stderr = result.stderr.splitlines(True)
+    assert len(stderr) >= 1
+    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
+    assert m is not None, \
+        'Ticket creation stderr is bad:\n%s' % result.stderr
+    eq(
+        stderr[1:],
+        [
+            "bugit new: file was not changed, discarding\n",
+            ],
+        )
+    new_head = storage.git_rev_parse(
+        rev='bugit/HEAD',
+        repo=tmp,
+        )
+    eq(orig_head, new_head)
+
+def test_editor_simple():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    class FakeTTYFileDescription(object):
+        def isatty(self):
+            return True
+
+    FAKE_EDITOR = os.path.join(
+        os.path.dirname(__file__),
+        'editor-append',
+        )
+
+    result = util.clitest(
+        args=[
+            'new',
+            ],
+        environ=dict(
+            BUGIT_EDITOR=FAKE_EDITOR,
+            ),
+        stdin=FakeTTYFileDescription(),
+        allow_stderr=True,
+        cwd=tmp,
+        )
+    result.check_stdout('')
+    stderr = result.stderr.splitlines(True)
+    assert len(stderr) >= 1
+    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
+    assert m is not None, \
+        'Ticket creation stderr is bad:\n%s' % result.stderr
+    ticket = m.group(1)
+    eq(
+        stderr[1:],
+        [
+            "bugit new: saved\n",
+            ],
+        )
+    def list_tickets():
+        # TODO share me
+        for (mode, type_, object, basename) in storage.git_ls_tree(
+            path='',
+            repo=tmp,
+            children=True,
+            ):
+            yield basename
+    got = list(list_tickets())
+    eq(got, [ticket])

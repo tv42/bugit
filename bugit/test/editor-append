@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+FILENAME="$1"; shift
+echo 'Kilroy was here' >>"$FILENAME"
+exit 0

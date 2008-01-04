@@ -68,18 +68,32 @@ def maketemp():
 
 class CLITestResult(object):
     def check_stdout(self, want):
-        eq(
-            self.stdout,
-            want,
-            'stdout does not match:\n%s' % self.stdout,
-            )
+        try:
+            fn = want.match
+        except AttributeError:
+            eq(
+                self.stdout,
+                want,
+                'stdout does not match:\n%s' % self.stdout,
+                )
+        else:
+            match = fn(self.stdout)
+            assert match, 'stdout does not match:\n%s' % self.stdout
+            return match
 
     def check_stderr(self, want):
-        eq(
-            self.stderr,
-            want,
-            'stderr does not match:\n%s' % self.stderr,
-            )
+        try:
+            fn = want.match
+        except AttributeError:
+            eq(
+                self.stderr,
+                want,
+                'stderr does not match:\n%s' % self.stderr,
+                )
+        else:
+            match = fn(self.stderr)
+            assert match, 'stderr does not match:\n%s' % self.stderr
+            return match
 
 def _get_script():
     my_distr = list(

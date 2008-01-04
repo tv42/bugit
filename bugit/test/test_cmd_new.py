@@ -42,18 +42,14 @@ I ran frob and it was supposed to blarb, but it qwarked.
         allow_stderr=True,
         )
     result.check_stdout('')
-    stderr = result.stderr.splitlines(True)
-    assert len(stderr) >= 1
-    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
-    assert m is not None, \
-        'Ticket creation stderr is bad:\n%s' % result.stderr
+    m = result.check_stderr(re.compile(r"""
+^
+bugit\ new:\ creating\ ticket\ ([0-9a-f]{40})\ \.\.\.\n
+bugit\ new:\ saved\n
+$
+""",
+                                       re.VERBOSE))
     ticket = m.group(1)
-    eq(
-        stderr[1:],
-        [
-            "bugit new: saved\n",
-            ],
-        )
 
     def list_tickets():
         # TODO share me
@@ -105,18 +101,14 @@ I ran frob and it was supposed to blarb, but it qwarked.
         allow_stderr=True,
         )
     result.check_stdout('')
-    stderr = result.stderr.splitlines(True)
-    assert len(stderr) >= 1
-    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
-    assert m is not None, \
-        'Ticket creation stderr is bad:\n%s' % result.stderr
+    m = result.check_stderr(re.compile(r"""
+^
+bugit\ new:\ creating\ ticket\ ([0-9a-f]{40})\ \.\.\.\n
+bugit\ new:\ saved\n
+$
+""",
+                                   re.VERBOSE))
     ticket = m.group(1)
-    eq(
-        stderr[1:],
-        [
-            "bugit new: saved\n",
-            ],
-        )
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -176,18 +168,14 @@ I ran frob and it was supposed to blarb, but it qwarked.
         exit_status=1,
         )
     result.check_stdout('')
-    stderr = result.stderr.splitlines(True)
-    assert len(stderr) >= 1
-    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
-    assert m is not None, \
-        'Ticket creation stderr is bad:\n%s' % result.stderr
+    m = result.check_stderr(re.compile(r"""
+^
+bugit\ new:\ creating\ ticket\ ([0-9a-f]{40})\ \.\.\.\n
+bugit\ new:\ cannot\ include\ ticket\ identity\ when\ creating\ ticket\n
+$
+""",
+                                       re.VERBOSE))
     ticket = m.group(1)
-    eq(
-        stderr[1:],
-        [
-            "bugit new: cannot include ticket identity when creating ticket\n",
-            ],
-        )
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(
@@ -222,18 +210,14 @@ frob=v2.4
         allow_stderr=True,
         )
     result.check_stdout('')
-    stderr = result.stderr.splitlines(True)
-    assert len(stderr) >= 1
-    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
-    assert m is not None, \
-        'Ticket creation stderr is bad:\n%s' % result.stderr
+    m = result.check_stderr(re.compile(r"""
+^
+bugit\ new:\ creating\ ticket\ ([0-9a-f]{40})\ \.\.\.\n
+bugit\ new:\ saved\n
+$
+""",
+                                       re.VERBOSE))
     ticket = m.group(1)
-    eq(
-        stderr[1:],
-        [
-            "bugit new: saved\n",
-            ],
-        )
 
     def list_tickets():
         # TODO share me
@@ -302,18 +286,14 @@ def test_editor_fail():
         exit_status=1,
         )
     result.check_stdout('')
-    stderr = result.stderr.splitlines(True)
-    assert len(stderr) >= 1
-    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
-    assert m is not None, \
-        'Ticket creation stderr is bad:\n%s' % result.stderr
-    eq(
-        stderr[1:],
-        [
-            "bugit new: editor failed with exit status 42\n",
-            #TODO "bugit new: file was not changed, discarding\n",
-            ],
-        )
+    result.check_stderr(re.compile(r"""
+^
+bugit\ new:\ creating\ ticket\ ([0-9a-f]{40})\ \.\.\.\n
+bugit\ new:\ editor\ failed\ with\ exit\ status\ 42\n
+#TODO bugit\ new:\ file\ was\ not\ changed,\ discarding\n
+$
+""",
+                                       re.VERBOSE))
     new_head = storage.git_rev_parse(
         rev='bugit/HEAD',
         repo=tmp,
@@ -349,17 +329,13 @@ def test_editor_noop():
         cwd=tmp,
         )
     result.check_stdout('')
-    stderr = result.stderr.splitlines(True)
-    assert len(stderr) >= 1
-    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
-    assert m is not None, \
-        'Ticket creation stderr is bad:\n%s' % result.stderr
-    eq(
-        stderr[1:],
-        [
-            "bugit new: file was not changed, discarding\n",
-            ],
-        )
+    result.check_stderr(re.compile(r"""
+^
+bugit\ new:\ creating\ ticket\ ([0-9a-f]{40})\ \.\.\.\n
+bugit\ new:\ file\ was\ not\ changed,\ discarding\n
+$
+""",
+                                       re.VERBOSE))
     new_head = storage.git_rev_parse(
         rev='bugit/HEAD',
         repo=tmp,
@@ -391,18 +367,15 @@ def test_editor_simple():
         cwd=tmp,
         )
     result.check_stdout('')
-    stderr = result.stderr.splitlines(True)
-    assert len(stderr) >= 1
-    m = re.match('^bugit new: creating ticket ([0-9a-f]{40}) \.\.\.$', stderr[0])
-    assert m is not None, \
-        'Ticket creation stderr is bad:\n%s' % result.stderr
+    m = result.check_stderr(re.compile(r"""
+^
+bugit\ new:\ creating\ ticket\ ([0-9a-f]{40})\ \.\.\.\n
+bugit\ new:\ saved\n
+$
+""",
+                                       re.VERBOSE))
     ticket = m.group(1)
-    eq(
-        stderr[1:],
-        [
-            "bugit new: saved\n",
-            ],
-        )
+
     def list_tickets():
         # TODO share me
         for (mode, type_, object, basename) in storage.git_ls_tree(

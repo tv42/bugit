@@ -30,7 +30,26 @@ def serialize(
             subsequent_indent='     ',
             break_long_words=False,
             )
-    print >>fp, 'seen build/301' #TODO
+    seen = set(transaction.ls(os.path.join(ticket, 'seen')))
+    if seen:
+        # TODO map to tags
+        seen = sorted(seen)
+        print >>fp, textwrap.fill(
+            ' '.join(seen),
+            initial_indent='seen ',
+            subsequent_indent='     ',
+            break_long_words=False,
+            )
+    not_seen = set(transaction.ls(os.path.join(ticket, 'not-seen')))
+    if not_seen:
+        # TODO map to tags
+        not_seen = sorted(not_seen)
+        print >>fp, textwrap.fill(
+            ' '.join(not_seen),
+            initial_indent='not-seen ',
+            subsequent_indent='         ',
+            break_long_words=False,
+            )
     print >>fp
     description = transaction.get(os.path.join(ticket, 'description')).rstrip()
     if description:

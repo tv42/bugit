@@ -173,6 +173,18 @@ able to find it in the server logs.
             'd239371f3b6b61ca1076bb460e331b3edb412970/browser',
             "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.6) Gecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)",
             )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/seen/c26ce22b9cf7f95f23c9efc461422d8bfe386628',
+            '',
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/seen/6f5613979900ee198042f6c3eb922d750bbfaa49',
+            '',
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/not-seen/7d330ee77f44d4e9106d7ab5161e2e58b0c33bf6',
+            '',
+            )
     result = util.clitest(
         args=[
             'show',
@@ -185,7 +197,9 @@ ticket d239371f3b6b61ca1076bb460e331b3edb412970
 number #3431
 tags priority:high denial-of-service security
      reporter:jdoe@example.com
-seen build/301
+seen 6f5613979900ee198042f6c3eb922d750bbfaa49
+     c26ce22b9cf7f95f23c9efc461422d8bfe386628
+not-seen 7d330ee77f44d4e9106d7ab5161e2e58b0c33bf6
 
 Oncolator segfaults on some inputs
 
@@ -222,7 +236,6 @@ Oncolator segfaults on some inputs
         )
     result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
-seen build/301
 
 Oncolator segfaults on some inputs
 
@@ -254,7 +267,6 @@ Oncolator segfaults on some inputs
     result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 number #3431
-seen build/301
 
 Oncolator segfaults on some inputs
 
@@ -281,7 +293,6 @@ Oncolator segfaults on some inputs
         )
     result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
-seen build/301
 
 Oncolator segfaults on some inputs
 
@@ -308,7 +319,6 @@ Oncolator segfaults on some inputs
         )
     result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
-seen build/301
 
 Oncolator segfaults on some inputs
 
@@ -340,7 +350,6 @@ Oncolator segfaults on some inputs
     result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
 name oncolator-segfault
-seen build/301
 
 Oncolator segfaults on some inputs
 
@@ -371,7 +380,6 @@ Oncolator segfaults on some inputs
         )
     result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
-seen build/301
 
 Oncolator segfaults on some inputs
 
@@ -413,7 +421,6 @@ Oncolator segfaults on some inputs
         )
     result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
-seen build/301
 
 Oncolator segfaults on some inputs
 
@@ -456,7 +463,6 @@ dear to author
         )
     result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
-seen build/301
 
 Oncolator segfaults on some inputs
 
@@ -496,14 +502,12 @@ Frob is kabork.
         )
     result.check_stdout("""\
 ticket d239371f3b6b61ca1076bb460e331b3edb412970
-seen build/301
 
 Oncolator segfaults on some inputs
 
 --
 ---
 ticket b6de831319bcac7de17dbd85432792daae5925dc
-seen build/301
 
 Frob is kabork.
 

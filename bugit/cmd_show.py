@@ -34,26 +34,29 @@ def main(appinfo, args):
         # TODO check for stored default ticket
         parser.error('no default ticket set')
 
-    if len(args) > 1:
-        parser.error('too many arguments')
-
-    (requested_ticket,) = args
-
+    requested = list(args)
     with storage.Transaction('.') as t:
-        try:
-            ticket = lookup.match(
-                transaction=t,
-                requested_ticket=requested_ticket,
-                )
-        except lookup.TicketLookupError, e:
-            print >>sys.stderr, '%s: %s' % (
-                os.path.basename(sys.argv[0]),
-                e,
-                )
-            sys.exit(1)
+        while True:
+            requested_ticket = requested.pop(0)
+            try:
+                ticket = lookup.match(
+                    transaction=t,
+                    requested_ticket=requested_ticket,
+                    )
+            except lookup.TicketLookupError, e:
+                print >>sys.stderr, '%s: %s' % (
+                    os.path.basename(sys.argv[0]),
+                    e,
+                    )
+                sys.exit(1)
 
-        serialize.serialize(
-            transaction=t,
-            ticket=ticket,
-            fp=sys.stdout,
-            )
+            serialize.serialize(
+                transaction=t,
+                ticket=ticket,
+                fp=sys.stdout,
+                )
+
+            if not requested:
+                break
+
+            print '---'

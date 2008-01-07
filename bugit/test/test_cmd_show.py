@@ -45,27 +45,6 @@ Usage: bugit show [OPTS] [TICKET]
 bugit: error: no default ticket set
 """)
 
-def test_bad_too_many_args():
-    tmp = util.maketemp()
-    storage.git_init(tmp)
-    storage.init(tmp)
-    result = util.clitest(
-        args=[
-            'show',
-            'foo',
-            'bar',
-            ],
-        cwd=tmp,
-        exit_status=2,
-        allow_stderr=True,
-        )
-    result.check_stdout('')
-    result.check_stderr("""\
-Usage: bugit show [OPTS] [TICKET]
-
-bugit: error: too many arguments
-""")
-
 def test_not_found_sha():
     tmp = util.maketemp()
     storage.git_init(tmp)
@@ -488,4 +467,45 @@ multiline=
 \tand my formatting
 \tis precious and
 \tdear to author
+""")
+
+def test_multiple():
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            """\
+Oncolator segfaults on some inputs
+""",
+            )
+        t.set(
+            'b6de831319bcac7de17dbd85432792daae5925dc/description',
+            """\
+Frob is kabork.
+""",
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'd239',
+            'b6de831319bca',
+            ],
+        cwd=tmp,
+        )
+    result.check_stdout("""\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
+seen build/301
+
+Oncolator segfaults on some inputs
+
+--
+---
+ticket b6de831319bcac7de17dbd85432792daae5925dc
+seen build/301
+
+Frob is kabork.
+
+--
 """)

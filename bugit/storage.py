@@ -359,21 +359,23 @@ class Transaction(object):
         self,
         repo=None,
         message=None,
+        ref=None,
         ):
         if repo is None:
             repo = '.'
         self.repo = repo
         self.message = message
+        if ref is None:
+            ref = 'bugit/HEAD'
+        self.ref = ref
 
     def __enter__(self):
         head = git_rev_parse(
-            rev='bugit/HEAD',
+            rev=self.ref,
             repo=self.repo,
             )
         if head is None:
-            raise RuntimeError(
-                'Repository is missing bugit/HEAD, '
-                +'run bugit init first.')
+            raise RuntimeError('Repository is missing ref')
         self.head = head
         self._edits = {}
         return self
@@ -451,7 +453,7 @@ class Transaction(object):
             and traceback is None):
             # but only actually use the results if this is a success
             git_update_ref(
-                ref='bugit/HEAD',
+                ref=self.ref,
                 sha=commit,
                 old_sha=self.head,
                 repo=self.repo,

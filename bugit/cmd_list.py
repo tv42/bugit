@@ -75,7 +75,7 @@ def main(appinfo, args):
             ident=ident,
             title=title,
             )
-        if description is not None:
+        if tags:
             print textwrap.fill(
                 ' '.join(tags),
                 initial_indent='  ',

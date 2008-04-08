@@ -51,10 +51,12 @@ def serialize(
             break_long_words=False,
             )
     print >>fp
-    description = snapshot.get(os.path.join(ticket, 'description')).rstrip()
-    if description:
-        print >>fp, description
-        print >>fp
+    description = snapshot.get(os.path.join(ticket, 'description'))
+    if description is not None:
+        description = description.rstrip()
+        if description:
+            print >>fp, description
+            print >>fp
     print >>fp, '--'
     def get_the_rest():
         for name in snapshot.ls(ticket):

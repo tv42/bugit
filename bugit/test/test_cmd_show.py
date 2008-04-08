@@ -513,3 +513,86 @@ Frob is kabork.
 
 --
 """)
+
+def test_description_missing():
+    # not really sure how you could end up without a description, but
+    # let's not totally fail
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(repo=tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/number',
+            '3431\n',
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'd239',
+            ],
+        cwd=tmp,
+        )
+    result.check_stdout("""\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
+number #3431
+
+--
+""")
+
+def test_description_empty():
+    # not really sure how you could end up without a description, but
+    # let's not totally fail
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(repo=tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            '',
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/number',
+            '3431\n',
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'd239',
+            ],
+        cwd=tmp,
+        )
+    result.check_stdout("""\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
+number #3431
+
+--
+""")
+
+def test_description_whitespace():
+    # not really sure how you could end up without a description, but
+    # let's not totally fail
+    tmp = util.maketemp()
+    storage.git_init(tmp)
+    storage.init(tmp)
+    with storage.Transaction(repo=tmp) as t:
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/description',
+            '\n',
+            )
+        t.set(
+            'd239371f3b6b61ca1076bb460e331b3edb412970/number',
+            '3431\n',
+            )
+    result = util.clitest(
+        args=[
+            'show',
+            'd239',
+            ],
+        cwd=tmp,
+        )
+    result.check_stdout("""\
+ticket d239371f3b6b61ca1076bb460e331b3edb412970
+number #3431
+
+--
+""")

@@ -329,7 +329,51 @@ class RaceCondition(Exception):
     """Update lost a race condition, retry"""
     pass
 
-class Transaction(object):
+class Snapshot(object):
+    """
+    Consistent snapshot view to a git repository.
+    """
+
+    def __init__(self, **kw):
+        repo = kw.pop('repo', None)
+        if repo is None:
+            repo = '.'
+        self.repo = repo
+        ref = kw.pop('ref', None)
+        if ref is None:
+            ref = 'bugit/HEAD'
+        self.ref = ref
+        super(Snapshot, self).__init__(**kw)
+
+    def __enter__(self):
+        head = git_rev_parse(
+            rev=self.ref,
+            repo=self.repo,
+            )
+        if head is None:
+            raise RuntimeError('Repository is missing ref')
+        self.head = head
+        return self
+
+    def __exit__(self, type_, value, traceback):
+        pass
+
+    def ls(self, path):
+        return ls(
+            repo=self.repo,
+            rev=self.head,
+            path=path,
+            )
+
+    def get(self, path):
+        return get(
+            path=path,
+            repo=self.repo,
+            rev=self.head,
+            )
+
+
+class Transaction(Snapshot):
     """
     Transacted write interface to git.
 
@@ -355,30 +399,14 @@ class Transaction(object):
     # somewhere, as they need a working directory or at least index.
     # But still, code reuse sounds like a smart idea.
 
-    def __init__(
-        self,
-        repo=None,
-        message=None,
-        ref=None,
-        ):
-        if repo is None:
-            repo = '.'
-        self.repo = repo
-        self.message = message
-        if ref is None:
-            ref = 'bugit/HEAD'
-        self.ref = ref
+    def __init__(self, **kw):
+        self.message = kw.pop('message', None)
+        super(Transaction, self).__init__(**kw)
 
     def __enter__(self):
-        head = git_rev_parse(
-            rev=self.ref,
-            repo=self.repo,
-            )
-        if head is None:
-            raise RuntimeError('Repository is missing ref')
-        self.head = head
+        r = super(Transaction, self).__enter__()
         self._edits = {}
-        return self
+        return r
 
     def _write_object(self, content):
         process = subprocess.Popen(
@@ -438,6 +466,8 @@ class Transaction(object):
         return sha
 
     def __exit__(self, type_, value, traceback):
+        super(Transaction, self).__exit__(type_, value, traceback)
+
         # store the tree in any case, for disaster recovery and
         # debugging
         tree = self._edit_tree(path='', edits=self._edits)
@@ -460,20 +490,6 @@ class Transaction(object):
                 )
         else:
             return False
-
-    def ls(self, path):
-        return ls(
-            repo=self.repo,
-            rev=self.head,
-            path=path,
-            )
-
-    def get(self, path):
-        return get(
-            path=path,
-            repo=self.repo,
-            rev=self.head,
-            )
 
     def _record(self, path, content):
         cur = self._edits

@@ -35,7 +35,7 @@ def main(appinfo, args):
         parser.error('no default ticket set')
 
     requested = list(args)
-    with storage.Transaction('.') as t:
+    with storage.Transaction(repo='.') as t:
         while True:
             requested_ticket = requested.pop(0)
             try:

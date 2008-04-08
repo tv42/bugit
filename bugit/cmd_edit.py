@@ -52,7 +52,7 @@ def main(appinfo, args):
 
     replace = options.replace
 
-    with storage.Transaction('.') as transaction:
+    with storage.Transaction(repo='.') as transaction:
 
         if ticket is not None:
             try:

@@ -85,7 +85,7 @@ def test_ambiguous():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/description',
             """\
@@ -134,7 +134,7 @@ def test_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/number',
             '3431\n',
@@ -220,7 +220,7 @@ def test_minimal():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/description',
             """\
@@ -246,7 +246,7 @@ def test_minimal_with_number():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/number',
             '3431\n',
@@ -277,7 +277,7 @@ def test_lookup_sha():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/description',
             """\
@@ -303,7 +303,7 @@ def test_lookup_sha_abbreviated_4():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/description',
             """\
@@ -329,7 +329,7 @@ def test_lookup_name():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/description',
             """\
@@ -360,7 +360,7 @@ def test_variable_short():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/description',
             """\
@@ -391,7 +391,7 @@ def test_variable_long():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/description',
             """\
@@ -437,7 +437,7 @@ def test_variable_multiline():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/description',
             """\
@@ -479,7 +479,7 @@ def test_multiple():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'd239371f3b6b61ca1076bb460e331b3edb412970/description',
             """\

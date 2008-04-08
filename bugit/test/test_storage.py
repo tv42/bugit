@@ -13,7 +13,7 @@ def test_transaction_abort():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
             'mockdata\n',
@@ -21,7 +21,7 @@ def test_transaction_abort():
     class MyException(Exception):
         pass
     try:
-        with storage.Transaction(tmp) as t:
+        with storage.Transaction(repo=tmp) as t:
             t.set(
                 'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
                 'newvalue\n',
@@ -41,7 +41,7 @@ def test_transaction_nop():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         pass
 
 def test_init():
@@ -66,7 +66,7 @@ def test_transaction_set_simple():
         rev='bugit/HEAD',
         repo=tmp,
         )
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
             'mockdata\n',
@@ -91,7 +91,7 @@ def test_ls_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
             'mockdata\n',
@@ -115,7 +115,7 @@ def test_rm_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
             'mockdata\n',
@@ -134,7 +134,7 @@ def test_rm_simple():
         )
     got = sorted(got)
     eq(got, sorted(['xyzzy', 'quux']))
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.rm('f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/quux')
     got = storage.ls(
         path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411',
@@ -147,7 +147,7 @@ def test_transaction_ls_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
             'mockdata\n',
@@ -160,7 +160,7 @@ def test_transaction_ls_simple():
             '5d6d80d51c73ea24e47f2de6f207b9de5479b6b2/quux',
             'distraction\n',
             )
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         got = t.ls(
             path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411',
             )
@@ -171,12 +171,12 @@ def test_transaction_get_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
             'mockdata\n',
             )
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         got = t.get(
             path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
             )

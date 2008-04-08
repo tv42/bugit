@@ -41,7 +41,7 @@ def test_no_match():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/number',
             '3431\n',
@@ -67,7 +67,7 @@ def test_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/number',
             '3431\n',
@@ -113,7 +113,7 @@ def test_tag_wrap():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/number',
             '3431\n',
@@ -168,7 +168,7 @@ def test_no_number():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/description',
             """\
@@ -212,7 +212,7 @@ def test_no_tags():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/description',
             """\

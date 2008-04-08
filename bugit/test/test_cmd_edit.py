@@ -30,7 +30,7 @@ def test_simple_stdin_ticketAsArg():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -91,7 +91,7 @@ def test_simple_stdin_ticketInStdin():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -189,7 +189,7 @@ def test_simple_stdin_ticketAsBoth_ok():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -250,7 +250,7 @@ def test_simple_stdin_ticketAsBoth_no_match():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -372,7 +372,7 @@ def test_variables():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -451,7 +451,7 @@ def test_replace_explicit():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -535,7 +535,7 @@ def test_update_explicit():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -628,7 +628,7 @@ def test_ticket_not_first_arg():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -689,7 +689,7 @@ def test_ticket_not_first_no_arg():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -748,7 +748,7 @@ def test_editor_fail():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -812,7 +812,7 @@ def test_editor_noop():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -884,7 +884,7 @@ def test_editor_simple():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -958,7 +958,7 @@ def test_editor_no_ticket():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',
@@ -1029,7 +1029,7 @@ def test_lookup_abbreviated():
     tmp = util.maketemp()
     storage.git_init(tmp)
     storage.init(tmp)
-    with storage.Transaction(tmp) as t:
+    with storage.Transaction(repo=tmp) as t:
         t.set(
             '29d7ae1a7d7cefd4c79d095ac0e47636aa02d4a5/description',
             'old',

@@ -4,16 +4,16 @@ import textwrap
 from bugit import tagsort
 
 def serialize(
-    transaction,
+    snapshot,
     ticket,
     fp,
     ):
     print >>fp, 'ticket %s' % ticket
-    number = transaction.get(os.path.join(ticket, 'number'))
+    number = snapshot.get(os.path.join(ticket, 'number'))
     if number is not None:
         number = number.rstrip()
         print >>fp, 'number #%s' % number
-    names = sorted(transaction.ls(os.path.join(ticket, 'name')))
+    names = sorted(snapshot.ls(os.path.join(ticket, 'name')))
     if names:
         print >>fp, textwrap.fill(
             ' '.join(names),
@@ -21,7 +21,7 @@ def serialize(
             subsequent_indent='     ',
             break_long_words=False,
             )
-    tags = set(transaction.ls(os.path.join(ticket, 'tags')))
+    tags = set(snapshot.ls(os.path.join(ticket, 'tags')))
     if tags:
         tags = tagsort.human_friendly_tagsort(tags)
         print >>fp, textwrap.fill(
@@ -30,7 +30,7 @@ def serialize(
             subsequent_indent='     ',
             break_long_words=False,
             )
-    seen = set(transaction.ls(os.path.join(ticket, 'seen')))
+    seen = set(snapshot.ls(os.path.join(ticket, 'seen')))
     if seen:
         # TODO map to tags
         seen = sorted(seen)
@@ -40,7 +40,7 @@ def serialize(
             subsequent_indent='     ',
             break_long_words=False,
             )
-    not_seen = set(transaction.ls(os.path.join(ticket, 'not-seen')))
+    not_seen = set(snapshot.ls(os.path.join(ticket, 'not-seen')))
     if not_seen:
         # TODO map to tags
         not_seen = sorted(not_seen)
@@ -51,13 +51,13 @@ def serialize(
             break_long_words=False,
             )
     print >>fp
-    description = transaction.get(os.path.join(ticket, 'description')).rstrip()
+    description = snapshot.get(os.path.join(ticket, 'description')).rstrip()
     if description:
         print >>fp, description
         print >>fp
     print >>fp, '--'
     def get_the_rest():
-        for name in transaction.ls(ticket):
+        for name in snapshot.ls(ticket):
             if name in [
                 'number',
                 'description',
@@ -75,7 +75,7 @@ def serialize(
     the_rest = sorted(get_the_rest())
     if the_rest:
         for name in the_rest:
-            content = transaction.get(os.path.join(ticket, name)).rstrip()
+            content = snapshot.get(os.path.join(ticket, name)).rstrip()
             if not content:
                 print >>fp, name
             elif '\n' not in content:

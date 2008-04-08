@@ -57,7 +57,7 @@ def main(appinfo, args):
         if ticket is not None:
             try:
                 ticket = lookup.match(
-                    transaction=transaction,
+                    snapshot=transaction,
                     requested_ticket=ticket,
                     )
             except lookup.TicketLookupError, e:
@@ -89,7 +89,7 @@ def main(appinfo, args):
 
             with file(filename, 'w+') as f:
                 serialize.serialize(
-                    transaction=transaction,
+                    snapshot=transaction,
                     ticket=ticket,
                     fp=f,
                     )
@@ -164,7 +164,7 @@ def main(appinfo, args):
                 sys.exit(1)
 
             if not lookup.exists(
-                transaction=transaction,
+                snapshot=transaction,
                 ticket=ticket,
                 ):
                 print >>sys.stderr, '%s edit: ticket not found: %s' % (

@@ -35,12 +35,12 @@ def main(appinfo, args):
         parser.error('no default ticket set')
 
     requested = list(args)
-    with storage.Transaction(repo='.') as t:
+    with storage.Snapshot(repo='.') as s:
         while True:
             requested_ticket = requested.pop(0)
             try:
                 ticket = lookup.match(
-                    transaction=t,
+                    snapshot=s,
                     requested_ticket=requested_ticket,
                     )
             except lookup.TicketLookupError, e:
@@ -51,7 +51,7 @@ def main(appinfo, args):
                 sys.exit(1)
 
             serialize.serialize(
-                transaction=t,
+                snapshot=s,
                 ticket=ticket,
                 fp=sys.stdout,
                 )

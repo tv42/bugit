@@ -17,24 +17,24 @@ class TicketNotFoundError(TicketLookupError):
 class MatchesMultipleTicketsError(TicketLookupError):
     """Matches more than one ticket"""
 
-def list_tickets(transaction):
+def list_tickets(snapshot):
     for (mode, type_, object, basename) in storage.git_ls_tree(
         path='',
-        treeish=transaction.head,
-        repo=transaction.repo,
+        treeish=snapshot.head,
+        repo=snapshot.repo,
         children=True,
         ):
         # TODO enforce filename sanity
         yield basename
 
 def match_all(
-    transaction,
+    snapshot,
     pattern,
     ):
-    g = list_tickets(transaction=transaction)
+    g = list_tickets(snapshot=snapshot)
     if pattern.startswith('#'):
         for ticket in g:
-            number = transaction.get(os.path.join(ticket, 'number'))
+            number = snapshot.get(os.path.join(ticket, 'number'))
             if number is not None:
                 number = number.rstrip()
                 if '#%s' % number == pattern:
@@ -46,21 +46,21 @@ def match_all(
                 if ticket.startswith(pattern):
                     yield ticket
             else:
-                has_name = transaction.get(
+                has_name = snapshot.get(
                     path=os.path.join(ticket, 'name', pattern),
                     )
                 if has_name is not None:
                     yield ticket
 
 def exists(
-    transaction,
+    snapshot,
     ticket,
     ):
     found = False
     for (mode, type_, object, basename) in storage.git_ls_tree(
         path=ticket,
-        treeish=transaction.head,
-        repo=transaction.repo,
+        treeish=snapshot.head,
+        repo=snapshot.repo,
         children=False,
         ):
         found = True
@@ -68,20 +68,20 @@ def exists(
     return found
 
 def match(
-    transaction,
+    snapshot,
     requested_ticket,
     ):
     if re.match('^[0-9a-f]{40}$', requested_ticket):
         # full sha, no need to look up, just check it's there
         if not exists(
-            transaction=transaction,
+            snapshot=snapshot,
             ticket=requested_ticket,
             ):
             raise TicketNotFoundError(requested_ticket)
         ticket = requested_ticket
     else:
         g = match_all(
-            transaction=transaction,
+            snapshot=snapshot,
             pattern=requested_ticket,
             )
         tickets = list(g)

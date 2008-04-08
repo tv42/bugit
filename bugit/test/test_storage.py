@@ -160,8 +160,8 @@ def test_transaction_ls_simple():
             '5d6d80d51c73ea24e47f2de6f207b9de5479b6b2/quux',
             'distraction\n',
             )
-    with storage.Transaction(repo=tmp) as t:
-        got = t.ls(
+    with storage.Snapshot(repo=tmp) as s:
+        got = s.ls(
             path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411',
             )
         got = sorted(got)
@@ -176,8 +176,8 @@ def test_transaction_get_simple():
             'f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
             'mockdata\n',
             )
-    with storage.Transaction(repo=tmp) as t:
-        got = t.get(
+    with storage.Snapshot(repo=tmp) as s:
+        got = s.get(
             path='f3da69cd9eca7a69ed72a4edf2d65c84e83b0411/xyzzy',
             )
         eq(got, 'mockdata\n')
